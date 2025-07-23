@@ -1,8 +1,11 @@
 ## main cli loop for stilts-agent.
+import subprocess
+
+from model import Model
 
 class CLI:
     def __init__(self):
-        pass
+        self.model = Model()
     
     def cli_loop(self):
         while True:
@@ -10,9 +13,12 @@ class CLI:
             if self.prompt.lower() == 'exit' or self.prompt.lower() == 'quit' or self.prompt.lower() == 'q':
                 print("Exiting CLI.")
                 break
-                
-            # prompt the LLM.
 
+            command = self.model.generate_command(self.prompt)
+            print(f"Generated STILTS command: {command}")
+
+            self.eval_execute_command(command)
+        
 
     def greating(self):
         print("Welcome to the Stilts CLI!")
@@ -37,11 +43,23 @@ class CLI:
         print("Prompt: 'Create a command to match catalogues input.fits and input2.fits using RA and dec columns to within 1 arcsec'.")
         print("2. ############")
         print("Prompt: ' How can I convert from a fits file to a csv file?'")
+
+    def eval_execute_command(self, command):
+        """execute the command"""
+        should_execute = input(f"Do you want to execute the command: {command}? (y/n): ")
+        if should_execute.lower() in ['yes', 'y']:
+            self.execute_command(command)
+        else:
+            print("Command execution skipped.")
+
     
-    def llm(self):
-        """call the llm to generate a command based on the prompt"""
-        # This function would interact with the LLM to generate a command based on the prompt.
-        pass
+    def execute_command(self, command):
+        """execute the command using subprocess"""
+        subprocess.run(command, shell=True, check=True)
+        print(
+            "Finished running STILTS command, check TESTING_CATALOG for the resulting output."
+        )
+       
 
 def main():
     cli = CLI()
