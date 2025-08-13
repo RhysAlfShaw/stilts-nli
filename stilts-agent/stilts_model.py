@@ -69,7 +69,7 @@ class StiltsModel:
             streamer=streamer,
             max_new_tokens=max_new_tokens,
             do_sample=True, # Set to True for more creative responses
-            temperature=0.7,
+            temperature=0.3,
             top_p=0.95,
             pad_token_id=107,
             eos_token_id=107

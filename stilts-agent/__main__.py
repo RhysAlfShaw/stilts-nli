@@ -30,7 +30,13 @@ class CLI:
         You can ask the model to create commands based on your prompts.
         Type 'help' for examples or 'q' to exit.
         """)
-        
+        self.message_history = []
+
+    def add_to_message_history(self, message):
+        """
+        Adds a message to the message history.
+        """
+        self.message_history.append(message)
 
     def cli_loop(self):
         while True:
@@ -43,8 +49,9 @@ class CLI:
                 self._help()
                 continue
                 
-            # command = self.model.generate_stream(self.prompt)
-            command = self.gen_model.generate_stream(self.input)
+            self.add_to_message_history({"role": "user", "content": self.input})
+
+            command = self.gen_model.generate_stream(self.message_history)
             full_chunks = ""
             print("\n")
             for chunk in command:
@@ -52,8 +59,10 @@ class CLI:
                       '', flush=True)
                 full_chunks += chunk
             print("\n")
-
+            self.add_to_message_history({"role": "assistant", "content": full_chunks})
+            
             gen_model_responce = full_chunks.strip()
+            
             if "stilts_command_generation" in gen_model_responce:
                 try:
                     description = gen_model_responce.split("properties='")[1].split("')")[0].strip("'\"")
@@ -70,7 +79,7 @@ class CLI:
                         except IndexError:
                             print("Error: processing llm tool call response")
 
-                print(f"Generating STILTS command for description: {description}")
+                # print(f"Generating STILTS command for description: {description}")
                 stilts_command = self.stilts_model.generate_stream(description)
                 full_command = ""
                 for chunk in stilts_command:
@@ -87,7 +96,11 @@ class CLI:
                     print(chunk, end='', flush=True)
                     full_explanation += chunk
                 print("\n")
-                # print(f"Command explanation: {full_explanation}")
+                self.add_to_message_history({
+                    "role": "assistant",
+                    "content": full_command + "\n\n" + full_explanation
+                })
+
                 
     def is_responce_function_call(self, response):
         """Check if the response is a function call."""

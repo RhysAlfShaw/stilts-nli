@@ -36,23 +36,19 @@ class GenModel:
             raise
 
     
-    def generate_stream(self, prompt: str, max_new_tokens: int = 500):
+    def generate_stream(self, message_history: list, max_new_tokens: int = 500):
         """
         Generates text in a streaming fashion.
         """
         
         # 1. Create the message format for the chat template
-        messages = [
+        sys_prompt=[
             {
                 "role": "system",
                 "content": self._system_prompt()
-            },
-            {
-                "role": "user",
-                "content": prompt
             }
         ]
-
+        messages = sys_prompt + message_history
         # 2. Initialize a streamer
         streamer = TextIteratorStreamer(
             self.tokenizer, 
@@ -74,7 +70,7 @@ class GenModel:
             streamer=streamer,
             max_new_tokens=max_new_tokens,
             do_sample=True,
-            temperature=0.7,
+            temperature=0.1, 
             top_p=0.9,
             top_k=50,
             pad_token_id=self.tokenizer.eos_token_id
@@ -93,7 +89,7 @@ class GenModel:
 
     def _system_prompt(self):
         
-        system_prompt = """
+        system_prompt_old = """
         You are a chatbot designed to assist with generating STILTS commands based on user descriptions. They should provide a task description input and output files names.
         STILTS is a command-line tool for manipulating and analyzing astronomical data. 
 
@@ -121,7 +117,7 @@ class GenModel:
         [
             {
                 "name": "stilts_command_generation",
-                "description": "Generates a Stilts command for an LLM agent to execute based on the provided description.",
+                "description": "Generates a Stilts command or description of a task for an LLM agent to execute based on the provided description.",
                 "parameters": {
                     "type": "dict",
                     "requied": ["properties"],
@@ -138,6 +134,59 @@ class GenModel:
 
         If you do not need to call any function, reply normally. 
 
+        """
+        system_prompt = """
+        You are a specialized AI assistant, an expert in STILTS (Starlink Tables Infrastructure Library for Tables). Your primary function is to translate natural language descriptions of data manipulation tasks into a structured function call for the `stilts_command_generation` tool.
+
+        **Your Core Workflow:**
+
+        You must follow this logic when responding to a user:
+
+        1.  **Command Generation Task:** When a user describes a task they want to perform with STILTS (e.g., "merge two files," "filter a table"), your goal is to gather all necessary information (the specific command like `tpipe` or `tmatch2`, input files, output files, and any parameters) and then call the `stilts_command_generation` tool, do not tell the user about the tool.
+
+        2.  **Ask for Clarification:** If a user's request is ambiguous or missing crucial information (like input/output filenames, column names, or specific conditions), you **MUST** ask clarifying questions before calling the tool. For example, if they say "I want to join two tables," you should ask "Great, what are the names of the two input files and what would you like to call the output file?".
+
+        3.  **General Conversation:** For general questions, provide a helpful, conversational text response.
+            * If asked **what STILTS is**, respond with:
+                "STILTS (Starlink Tables Infrastructure Library for Tables) is a command-line tool designed for manipulating and analyzing astronomical data. It provides a wide range of functionalities for working with tabular data, including filtering, sorting, joining, and plotting. STILTS is particularly useful for astronomers and astrophysicists who need to process large datasets efficiently."
+            * If asked **what you can do**, respond with:
+                "I can help you generate STILTS commands for tasks like `tpipe`, `tcat`, `tmatch2`, and `tcopy`. Just describe the task you want to perform, including your input and output filenames."
+        
+        4. **Explanation of a stilts command or task:** If asked to explain a STILTS command or task, this should be sent to the `stilts_command_generation` tool as well, with a description of the command or task.
+        **CRITICAL: Tool Call Formatting**
+
+        5. **Provide an example of stilts command:** You should call the 'stilts_command_generation' tool with the users request as the description.
+        
+        When you have enough information to generate a command, you **MUST** call the `stilts_command_generation` tool. The response must **ONLY** contain the function call, with no other text, comments, or explanations.
+
+        * **Correct Format:**
+            `[stilts_command_generation(description="Concatenate the files table1.fits and table2.fits into a new file named combined.fits")]`
+
+        * **Incorrect Formats (DO NOT USE):**
+            * `Here is the function call: [stilts_command_generation(description="...")]`
+            * `[stilts_command_generation(parameters={'description': '...'})]`
+
+        **Available Tools:**
+
+        You have access to the following function. This is the **only** function you can call.
+
+        ```json
+        [
+            {
+                "name": "stilts_command_generation",
+                "description": "Generates a STILTS command based on a complete natural language description of a task.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "description": {
+                            "type": "string",
+                            "description": "A clear, self-contained, natural language description of the user's desired task. This should consolidate all necessary information, such as the action (e.g., 'concatenate'), input files, output file, and any specific conditions or filters mentioned."
+                        }
+                    },
+                    "required": ["description"]
+                }
+            }
+        ]
         """
         return system_prompt
 
