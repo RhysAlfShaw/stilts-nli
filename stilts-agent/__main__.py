@@ -31,9 +31,9 @@ class CLI:
         self.gen_model = GenModel()
         print(f"""
         {colors['green']}{colors['bold']}
-        Welcome to the Stilts CLI!
+        Welcome to the Stilts Natural Language Interface!
         {colors['reset']}
-        This CLI allows you to generate STILTS commands using a language model.
+        This tool allows you to generate STILTS commands and execute them using a natural language.
         You can ask the model to create commands based on your prompts.{colors['bold']}
         Type 'help/h' for guidence, 'clear/c' to clear the message history, 'quit/q' to exit.{colors['reset']}
         Save message history to a file type 'save/s'.
@@ -84,7 +84,7 @@ class CLI:
                 # Once we detect a tool call, we stop printing for the rest of the stream.
                 if not is_tool_call and '[' in chunk:
                     is_tool_call = True
-                
+
                 if not is_tool_call:
                     print(chunk, end='', flush=True)
             
@@ -130,18 +130,21 @@ class CLI:
                     continue
             
             if "execute_stilts_command" in gen_model_responce:
-                print(gen_model_responce)
                 # Use regex for robust parsing of the tool call
                 matches = re.findall(r"execute_stilts_command\s*\(\s*stilts_command\s*=\s*['\"](.*?)['\"]\s*\)", gen_model_responce, re.DOTALL)
-                print(matches)
                 if matches:
                     for command in matches:
-                        print(f"Executing STILTS command: {command}")
-                        self.eval_execute_command(command)
+                        # print(f"Executing STILTS command: {command}")
+                        returned_output = self.eval_execute_command(command)
+                        self.add_to_message_history({
+                            "role": "python",
+                            "content": f"{returned_output}"
+                        })
                 else:
                     print(f"{colors['red']}Error: Could not parse command from LLM tool call response.{colors['reset']}")
                     continue
 
+            
 
 
                 
@@ -171,18 +174,27 @@ class CLI:
         """execute the command"""
         should_execute = input(f"\n\nDo you want to execute this? (y/n): ")
         if should_execute.lower() in ['yes', 'y']:
-            self.execute_command(command)
+            returned_out = self.execute_command(command)
         else:
             print("Command execution skipped.")
+        
+        return returned_out
 
     
     def execute_command(self, command):
         """execute the command using subprocess"""
-        subprocess.run(command, shell=True, check=True)
-        print(
-            "Finished running STILTS command, check TESTING_CATALOG for the resulting output."
-        )
-       
+        try:
+            print(f"{colors['yellow']}")
+            run = subprocess.run(command, shell=True, check=True, text=True, capture_output=True)
+            print(f"{colors['reset']}")
+            print(f"{colors['green']}Command executed successfully.{colors['reset']}")
+            return run.stdout
+
+        except subprocess.CalledProcessError as e:
+            print(e.stderr)
+            print(f"{colors['red']}Error executing command: {e}{colors['reset']}")
+            return e.stderr
+        
 
 def main():
     cli = CLI()

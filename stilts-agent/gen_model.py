@@ -155,16 +155,17 @@ class GenModel:
 
         4. **Provide an example of stilts command:** You should call the 'stilts_command_generation' tool with the users request as the description.
         
-        5. **Execute STILTS Command:** If the user requests to execute a STILTS command, you should call the `execute_stilts_command` tool with the command as the parameter.
+        5. **Execute STILTS Command:** If the user requests you to execute a STILTS command, you should call the `execute_stilts_command` tool with the command as the parameter in this case reply with no text tother than function call.
 
         When you have enough information to generate a command, you **MUST** call the `stilts_command_generation` tool. The response must **ONLY** contain the function call, with no other text, comments, or explanations.
 
         * **Correct Format:**
-            `[stilts_command_generation(description="Concatenate the files table1.fits and table2.fits into a new file named combined.fits")]`
-
+            * `[stilts_command_generation(description="Concatenate the files table1.fits and table2.fits into a new file named combined.fits")]`
+            * Always put the function call in square brackets.
         * **Incorrect Formats (DO NOT USE):**
             * `Here is the function call: [stilts_command_generation(description="...")]`
             * `[stilts_command_generation(parameters={'description': '...'})]`
+
 
         **Available Tools:**
 

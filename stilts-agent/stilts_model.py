@@ -5,8 +5,9 @@ from transformers import AutoModelForCausalLM, AutoTokenizer, TextIteratorStream
 
 class StiltsModel:
     """
-    A class to encapsulate a Hugging Face language model for text generation.
+    A class to encapsulate the finetunned model for text generation.
     """
+    # path will eventually be replaced with a huggingface repo ID.
     def __init__(self, model_name: str = "/scratch/Rhys/stilts_models/gemma-2b-it-finetuned/final_model"):
         """
         Initializes the Model class.
