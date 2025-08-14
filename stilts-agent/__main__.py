@@ -34,7 +34,8 @@ class CLI:
         Welcome to the Stilts Natural Language Interface!
         {colors['reset']}
         This tool allows you to generate STILTS commands and execute them using a natural language.
-        You can ask the model to create commands based on your prompts.{colors['bold']}
+        You can ask the model to create commands based on your prompts.
+        Once it generates a command ask it to execute it.{colors['bold']}
         Type 'help/h' for guidence, 'clear/c' to clear the message history, 'quit/q' to exit.{colors['reset']}
         Save message history to a file type 'save/s'.
         """)
