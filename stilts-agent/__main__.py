@@ -7,9 +7,6 @@ import json
 from stilts_model import StiltsModel
 from gen_model import GenModel 
 
-
-
-# Add this at the beginning of your script
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
 colors = {
@@ -77,12 +74,9 @@ class CLI:
             full_chunks = ""
             is_tool_call = False
             print("\n")
-            # Stream the response from the general model.
-            # If it's a regular text response, print it as it comes.
-            # If it's a tool call (detected by '['), stop printing and just accumulate it.
+            
             for chunk in command:
                 full_chunks += chunk
-                # Once we detect a tool call, we stop printing for the rest of the stream.
                 if not is_tool_call and '[' in chunk:
                     is_tool_call = True
 
@@ -91,21 +85,17 @@ class CLI:
             
             if not is_tool_call:   
                 print("\n")
-            # print("TESING: ", full_chunks.strip())
             self.add_to_message_history({"role": "assistant", "content": full_chunks})
             
             gen_model_responce = full_chunks.strip()
 
-            # check if there is more than one tool call in the response
 
 
 
             if "stilts_command_generation" in gen_model_responce:
-                # Use regex for robust parsing of the tool call
                 matches = re.findall(r"stilts_command_generation\s*\(\s*description\s*=\s*['\"](.*?)['\"]\s*\)", gen_model_responce, re.DOTALL)
                 if matches:
                     for description in matches:
-                        # print(f"Generating STILTS command for description: {description}")
                         stilts_command = self.stilts_model.generate_stream(description)
                         full_command = ""
                         for chunk in stilts_command:
@@ -131,11 +121,9 @@ class CLI:
                     continue
             
             if "execute_stilts_command" in gen_model_responce:
-                # Use regex for robust parsing of the tool call
                 matches = re.findall(r"execute_stilts_command\s*\(\s*stilts_command\s*=\s*['\"](.*?)['\"]\s*\)", gen_model_responce, re.DOTALL)
                 if matches:
                     for command in matches:
-                        # print(f"Executing STILTS command: {command}")
                         returned_output = self.eval_execute_command(command)
                         self.add_to_message_history({
                             "role": "python",

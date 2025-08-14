@@ -7,7 +7,7 @@ class StiltsModel:
     """
     A class to encapsulate the finetunned model for text generation.
     """
-    # path will eventually be replaced with a huggingface repo ID.
+
     def __init__(self, model_name: str = "RAShaw/stilts_gemma_2b_finetunned_prototype"):
         """
         Initializes the Model class.
@@ -53,7 +53,6 @@ class StiltsModel:
         Yields:
             str: The next chunk of generated text.
         """
-        # 1. Create the streamer
         streamer = TextIteratorStreamer(
             self.tokenizer, 
             skip_prompt=True, 
@@ -61,7 +60,6 @@ class StiltsModel:
         )
         prompt = """<start_of_turn>user""" + prompt + """<end_of_turn>model"""
         
-        # 3. Define generation arguments
 
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
 
@@ -69,17 +67,15 @@ class StiltsModel:
             **inputs,
             streamer=streamer,
             max_new_tokens=max_new_tokens,
-            do_sample=True, # Set to True for more creative responses
+            do_sample=True,
             temperature=0.3,
             top_p=0.95,
             pad_token_id=107,
             eos_token_id=107
         )
 
-        # 4. Start the generation in a separate thread
         thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
         thread.start()
 
-        # 5. Yield new tokens from the streamer as they become available
         for new_text in streamer:
             yield new_text

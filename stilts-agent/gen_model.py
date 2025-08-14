@@ -29,7 +29,6 @@ class GenModel:
             print("Model loaded successfully.")
             if self.tokenizer.pad_token is None:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
-            # You can also set the model's config, which is what the warning is about
             self.model.config.pad_token_id = self.tokenizer.pad_token_id
         except Exception as e:
             print(f"Error loading model: {e}")
@@ -41,7 +40,6 @@ class GenModel:
         Generates text in a streaming fashion.
         """
         
-        # 1. Create the message format for the chat template
         sys_prompt=[
             {
                 "role": "system",
@@ -49,22 +47,17 @@ class GenModel:
             }
         ]
         messages = sys_prompt + message_history
-        # 2. Initialize a streamer
         streamer = TextIteratorStreamer(
             self.tokenizer, 
             skip_prompt=True, 
             skip_special_tokens=True
         )
 
-        # 3. Apply the chat template and tokenize the input
-        # Note: We tokenize here to prepare the 'inputs' dictionary
         prompt_templated = self.tokenizer.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
         )
 
         inputs = self.tokenizer(prompt_templated, return_tensors="pt").to(self.device)
-        
-        # 4. Define generation arguments, including the streamer
         generation_kwargs = dict(
             **inputs,
             streamer=streamer,
@@ -76,12 +69,10 @@ class GenModel:
             pad_token_id=self.tokenizer.eos_token_id
         )
 
-        # 5. Start the generation in a separate thread
-        #    This is NON-BLOCKING. The program continues to the next line immediately.
+        
         thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
         thread.start()
         
-        # 6. Yield new tokens from the streamer as they become available
         for new_text in streamer:
             yield new_text
 
