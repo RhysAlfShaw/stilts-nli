@@ -8,7 +8,7 @@ class StiltsModel:
     A class to encapsulate the finetunned model for text generation.
     """
     # path will eventually be replaced with a huggingface repo ID.
-    def __init__(self, model_name: str = "/scratch/Rhys/stilts_models/gemma-2b-it-finetuned/final_model"):
+    def __init__(self, model_name: str = "RAShaw/stilts_gemma_2b_finetunned_prototype"):
         """
         Initializes the Model class.
 

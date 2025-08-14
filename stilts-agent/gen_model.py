@@ -155,7 +155,7 @@ class GenModel:
 
         4. **Provide an example of stilts command:** You should call the 'stilts_command_generation' tool with the users request as the description.
         
-        5. **Execute STILTS Command:** If the user requests you to execute a STILTS command, you should call the `execute_stilts_command` tool with the command as the parameter in this case reply with no text tother than function call.
+        5. **Execute STILTS Command:** If the user requests you to execute, run or process or similar a STILTS command, you should call the `execute_stilts_command` tool with the command as the parameter in this case reply with no text tother than function call.
 
         When you have enough information to generate a command, you **MUST** call the `stilts_command_generation` tool. The response must **ONLY** contain the function call, with no other text, comments, or explanations.
 

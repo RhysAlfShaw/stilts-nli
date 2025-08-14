@@ -176,7 +176,8 @@ class CLI:
         if should_execute.lower() in ['yes', 'y']:
             returned_out = self.execute_command(command)
         else:
-            print("Command execution skipped.")
+            print(f"{colors['green']}Command execution skipped.{colors['reset']}")
+            returned_out = "Command execution skipped."
         
         return returned_out
 
