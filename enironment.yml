@@ -1,0 +1,12 @@
+name: stilts-agent
+channels:
+  - default  
+  - conda-forge
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+      - numpy
+      - torch
+      - transformers
+      - accelerate
