@@ -1,10 +1,13 @@
 ## main cli loop for stilts-agent.
 import subprocess
+import re
+import logging
+import json
 
 from stilts_model import StiltsModel
 from gen_model import GenModel 
 
-import logging
+
 
 # Add this at the beginning of your script
 logging.getLogger("transformers").setLevel(logging.ERROR)
@@ -17,18 +20,23 @@ colors = {
     "magenta": "\033[95m",
     "cyan": "\033[96m",
     "white": "\033[97m",
-    "reset": "\033[0m"
+    "reset": "\033[0m",
+    "bold": "\033[1m",
+    "underline": "\033[4m"
 }
 
 class CLI:
     def __init__(self):
         self.stilts_model = StiltsModel()
         self.gen_model = GenModel()
-        print("""
+        print(f"""
+        {colors['green']}{colors['bold']}
         Welcome to the Stilts CLI!
+        {colors['reset']}
         This CLI allows you to generate STILTS commands using a language model.
-        You can ask the model to create commands based on your prompts.
-        Type 'help' for examples or 'q' to exit.
+        You can ask the model to create commands based on your prompts.{colors['bold']}
+        Type 'help/h' for guidence, 'clear/c' to clear the message history, 'quit/q' to exit.{colors['reset']}
+        Save message history to a file type 'save/s'.
         """)
         self.message_history = []
 
@@ -42,64 +50,99 @@ class CLI:
         while True:
             self.get_input()
             if self.input.lower() == 'exit' or self.input.lower() == 'quit' or self.input.lower() == 'q':
-                print("Exiting CLI.")
+                print(f"{colors['red']}Exiting CLI.{colors['reset']}")
                 break
 
-            elif self.input.lower() == 'help':
+            elif self.input.lower() == 'help' or self.input.lower() == 'h':
                 self._help()
                 continue
-                
+
+            elif self.input.lower() == 'clear' or self.input.lower() == 'c':
+                self.message_history = []
+                print(f"{colors['red']}Message history cleared.{colors['reset']}")
+                continue
+
+            elif self.input.lower() == 'save' or self.input.lower() == 's':
+                filename = input("Enter filename to save message history (without extension): ")
+                # save history as JSON 
+                with open(f"{filename}.json", "w") as f:
+                    json.dump(self.message_history, f, indent=4)
+                print(f"{colors['green']}Message history saved to {filename}.json{colors['reset']}")
+                continue
+
             self.add_to_message_history({"role": "user", "content": self.input})
 
             command = self.gen_model.generate_stream(self.message_history)
             full_chunks = ""
+            is_tool_call = False
             print("\n")
+            # Stream the response from the general model.
+            # If it's a regular text response, print it as it comes.
+            # If it's a tool call (detected by '['), stop printing and just accumulate it.
             for chunk in command:
-                print(chunk, end=
-                      '', flush=True)
                 full_chunks += chunk
-            print("\n")
+                # Once we detect a tool call, we stop printing for the rest of the stream.
+                if not is_tool_call and '[' in chunk:
+                    is_tool_call = True
+                
+                if not is_tool_call:
+                    print(chunk, end='', flush=True)
+            
+            if not is_tool_call:   
+                print("\n")
+            # print("TESING: ", full_chunks.strip())
             self.add_to_message_history({"role": "assistant", "content": full_chunks})
             
             gen_model_responce = full_chunks.strip()
-            
+
+            # check if there is more than one tool call in the response
+
+
+
             if "stilts_command_generation" in gen_model_responce:
-                try:
-                    description = gen_model_responce.split("properties='")[1].split("')")[0].strip("'\"")
-                except IndexError:
-                    try:
-                        description = (
-                            gen_model_responce.split("description=")[1].split(")")[0].strip("'\"")
+                # Use regex for robust parsing of the tool call
+                matches = re.findall(r"stilts_command_generation\s*\(\s*description\s*=\s*['\"](.*?)['\"]\s*\)", gen_model_responce, re.DOTALL)
+                if matches:
+                    for description in matches:
+                        # print(f"Generating STILTS command for description: {description}")
+                        stilts_command = self.stilts_model.generate_stream(description)
+                        full_command = ""
+                        for chunk in stilts_command:
+                            print(chunk, end='', flush=True)
+                            full_command += chunk
+
+                        print("\n")
+
+                        command_explanation = self.stilts_model.generate_stream(
+                            f"Explain the following STILTS command: {full_command}"
                         )
-                    except IndexError:
-                        try:
-                            description = (
-                                gen_model_responce.split("type='")[1].split("')")[0].strip("'\"")
-                            )
-                        except IndexError:
-                            print("Error: processing llm tool call response")
+                        full_explanation = ""
+                        for chunk in command_explanation:
+                            print(chunk, end='', flush=True)
+                            full_explanation += chunk
+                        print("\n")
+                        self.add_to_message_history({
+                            "role": "assistant",
+                            "content": full_command + "\n\n" + full_explanation
+                        })
+                else:
+                    print(f"{colors['red']}Error: Could not parse description from LLM tool call response.{colors['reset']}")
+                    continue
+            
+            if "execute_stilts_command" in gen_model_responce:
+                print(gen_model_responce)
+                # Use regex for robust parsing of the tool call
+                matches = re.findall(r"execute_stilts_command\s*\(\s*stilts_command\s*=\s*['\"](.*?)['\"]\s*\)", gen_model_responce, re.DOTALL)
+                print(matches)
+                if matches:
+                    for command in matches:
+                        print(f"Executing STILTS command: {command}")
+                        self.eval_execute_command(command)
+                else:
+                    print(f"{colors['red']}Error: Could not parse command from LLM tool call response.{colors['reset']}")
+                    continue
 
-                # print(f"Generating STILTS command for description: {description}")
-                stilts_command = self.stilts_model.generate_stream(description)
-                full_command = ""
-                for chunk in stilts_command:
-                    print(chunk, end='', flush=True)
-                    full_command += chunk
 
-                print("\n")
-
-                command_explanation = self.stilts_model.generate_stream(
-                    f"Explain the following STILTS command: {full_command}"
-                )
-                full_explanation = ""
-                for chunk in command_explanation:
-                    print(chunk, end='', flush=True)
-                    full_explanation += chunk
-                print("\n")
-                self.add_to_message_history({
-                    "role": "assistant",
-                    "content": full_command + "\n\n" + full_explanation
-                })
 
                 
     def is_responce_function_call(self, response):
