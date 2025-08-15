@@ -3,6 +3,7 @@ import subprocess
 import re
 import logging
 import json
+import argparse
 
 from stilts_model import StiltsModel
 from gen_model import GenModel 
@@ -23,9 +24,27 @@ colors = {
 }
 
 class CLI:
-    def __init__(self):
-        self.stilts_model = StiltsModel()
-        self.gen_model = GenModel()
+    def __init__(self,
+                 inference_library, 
+                 num_proc, 
+                 device: str):
+        
+        self.inference_library = inference_library
+        self.num_proc = num_proc
+        print(f"Using inference library: {self.inference_library}, number of processes: {self.num_proc}, device: {device}")
+        
+        if device not in ["cpu", "cuda"]:
+            raise ValueError("Device must be 'cpu' or 'cuda'.")
+
+        self.device = device
+
+        self.stilts_model = StiltsModel(inference_library=self.inference_library, 
+                                        num_proc=self.num_proc, 
+                                        device=self.device)
+        
+        self.gen_model = GenModel(inference_library=self.inference_library, 
+                                  num_proc=self.num_proc, 
+                                  device=self.device)
         print(f"""
         {colors['green']}{colors['bold']}
         Welcome to the Stilts Natural Language Interface!
@@ -192,4 +211,21 @@ def main():
     cli.run()
 
 if __name__ == "__main__":
-    main()
+
+    parser = argparse.ArgumentParser(description="Stilts Agent CLI")
+    parser.add_argument("--inference_library", type=str, default="llama_cpp",
+                        help="Inference library (transformers or llama_cpp)")
+    
+    parser.add_argument("--num_proc", type=int, default=5,
+                        help="Number of processors for llama_cpp")
+    
+    parser.add_argument("--device", type=str, default="cpu",
+                        help="Device to run on (cpu or cuda)")
+    
+    args = parser.parse_args()
+
+    cli = CLI(inference_library=args.inference_library, 
+              num_proc=args.num_proc, 
+              device=args.device)
+    cli.greating()
+    cli.run()
