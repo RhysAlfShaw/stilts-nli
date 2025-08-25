@@ -3,11 +3,18 @@ import subprocess
 import re
 import logging
 import json
+import argparse
+
+from prompt_toolkit import prompt, PromptSession
+from prompt_toolkit.history import InMemoryHistory
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
 from stilts_model import StiltsModel
 from gen_model import GenModel 
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
+
+prompt_session_history = PromptSession()
 
 colors = {
     "red": "\033[91m",
@@ -23,20 +30,61 @@ colors = {
 }
 
 class CLI:
-    def __init__(self):
-        self.stilts_model = StiltsModel()
-        self.gen_model = GenModel()
-        print(f"""
-        {colors['green']}{colors['bold']}
-        Welcome to the Stilts Natural Language Interface!
-        {colors['reset']}
-        This tool allows you to generate STILTS commands and execute them using a natural language.
-        You can ask the model to create commands based on your prompts.
-        Once it generates a command ask it to execute it.{colors['bold']}
-        Type 'help/h' for guidence, 'clear/c' to clear the message history, 'quit/q' to exit.{colors['reset']}
-        Save message history to a file type 'save/s'.
-        """)
-        self.message_history = []
+    def __init__(self,
+                 inference_library, 
+                 num_proc, 
+                 device: str,
+                 stilts_model_only: bool = False):
+        
+        self.stilts_model_only = stilts_model_only
+        self.inference_library = inference_library
+        self.num_proc = num_proc
+        print(f"Using inference library: {self.inference_library}, number of processes: {self.num_proc}, device: {device}")
+        
+        if device not in ["cpu", "cuda"]:
+            raise ValueError("Device must be 'cpu' or 'cuda'.")
+
+        self.device = device
+
+        self.stilts_model = StiltsModel(inference_library=self.inference_library, 
+                                        num_proc=self.num_proc, 
+                                        device=self.device)
+        if self.stilts_model_only:
+            print(f"{colors['green']}Running in Stilts Model Only mode.{colors['reset']}")
+            
+        
+        else:
+            
+            self.gen_model = GenModel(inference_library=self.inference_library, 
+                                        num_proc=self.num_proc, 
+                                        device=self.device)
+            print(f"""
+            {colors['green']}{colors['bold']}
+            Welcome to the Stilts Natural Language Interface!
+            {colors['reset']}
+            This tool allows you to generate STILTS commands and execute them using a natural language.
+            You can ask the model to create commands based on your prompts.
+            Once it generates a command ask it to execute it.{colors['bold']}
+            Type 'help/h' for guidence, 'clear/c' to clear the message history, 'quit/q' to exit.{colors['reset']}
+            Save message history to a file type 'save/s'.
+            """)
+            self.message_history = []
+
+    def stilts_model_loop(self):
+        while True:
+            description = prompt_session_history.prompt("Enter a description for the STILTS command (or type 'exit' to quit): ",auto_suggest=AutoSuggestFromHistory())
+            if description.lower() in ['exit', 'quit', 'q']:
+                print(f"{colors['red']}Exiting Stilts Model Loop.{colors['reset']}")
+                break
+            
+            stilts_command = self.stilts_model.generate_stream(description)
+            full_command = ""
+            print("\nGenerated STILTS Command:\n")
+            for chunk in stilts_command:
+                print(chunk, end='', flush=True)
+                full_command += chunk
+            print("\n")
+
 
     def add_to_message_history(self, message):
         """
@@ -61,7 +109,7 @@ class CLI:
                 continue
 
             elif self.input.lower() == 'save' or self.input.lower() == 's':
-                filename = input("Enter filename to save message history (without extension): ")
+                filename = prompt_session_history.prompt("Enter filename to save message history (without extension): ",auto_suggest=AutoSuggestFromHistory())
                 # save history as JSON 
                 with open(f"{filename}.json", "w") as f:
                     json.dump(self.message_history, f, indent=4)
@@ -146,11 +194,14 @@ class CLI:
 
     def get_input(self):
         """ask the user for a command"""
-        self.input = input(">> ")
+        self.input = prompt_session_history.prompt(">> ",auto_suggest=AutoSuggestFromHistory())
     
     def run(self):
         # start loop for the CLI
-        self.cli_loop()
+        if self.stilts_model_only:
+            self.stilts_model_loop()
+        else:   
+            self.cli_loop()
 
     def _help(self):
         print("Example prompts:")
@@ -186,10 +237,31 @@ class CLI:
             return e.stderr
         
 
-def main():
-    cli = CLI()
-    cli.greating()
-    cli.run()
+# def main():
+#     cli = CLI()
+#     cli.greating()
+#     cli.run()
 
 if __name__ == "__main__":
-    main()
+
+    parser = argparse.ArgumentParser(description="Stilts Agent CLI")
+    parser.add_argument("--inference_library", type=str, default="transformers",
+                        help="Inference library (transformers or llama_cpp)")
+    
+    parser.add_argument("--num_proc", type=int, default=5,
+                        help="Number of processors for llama_cpp")
+    
+    parser.add_argument("--device", type=str, default="cuda",
+                        help="Device to run on (cpu or cuda)")
+    
+    parser.add_argument("--stilts_model_only", action="store_true",
+                        help="Run only the Stilts model for command generation")
+    
+    args = parser.parse_args()
+
+    cli = CLI(inference_library=args.inference_library, 
+              num_proc=args.num_proc, 
+              device=args.device,
+              stilts_model_only=args.stilts_model_only)
+    cli.greating()
+    cli.run()

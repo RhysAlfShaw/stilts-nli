@@ -7,17 +7,49 @@ from transformers import (
 )
 import torch
 
-class GenModel:
-    def __init__(self, model_name: str = "meta-llama/Llama-3.2-3B-Instruct"):   
-        self.model_name = model_name
+TEMPERATURE = 0.1
 
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+class GenModel:
+    def __init__(self, 
+                 model_name: str = "meta-llama/Llama-3.2-3B-Instruct", 
+                 inference_library: str = "llama_cpp", 
+                 num_proc: int = 5, 
+                 device: str = "cpu"):   
+        
+        self.model_name = model_name
+    
+        if device == "cpu":
+            print("Warning: Running on CPU may be slow. Consider using llama_cpp for faster CPU inference or running on a GPU.")
+            self.device = device
+       
+        elif device == "cuda":
+            if torch.cuda.is_available():
+                print("Using GPU for inference.")
+                self.device = device
+            else:
+                print("CUDA is not available, falling back to CPU.")
+                self.device = "cpu"                
+        else:
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            if self.device == "cpu":
+                print("Warning: Running on CPU may be slow. Consider using llama_cpp for faster CPU inference or running on a GPU.")
+
+        self.device = device
+        self.num_proc = num_proc
         self.model = None
         self.tokenizer = None
-        self.load_model()
+        self.inference_library = inference_library
+
+        if self.inference_library == "transformers":
+            self.load_model_transformers()
+        elif self.inference_library == "llama_cpp":
+            self.model_name = "bartowski/Llama-3.2-3B-Instruct-GGUF" 
+            self.load_model_llama_cpp()
+        else:
+            raise ValueError(f"Unsupported inference library: {self.inference_library}, please use 'transformers' or 'llama_cpp'.")
 
 
-    def load_model(self):
+    def load_model_transformers(self):
         print(f"Loading model '{self.model_name}' onto {self.device}...")
         try:
             self.model = AutoModelForCausalLM.from_pretrained(
@@ -30,12 +62,84 @@ class GenModel:
             if self.tokenizer.pad_token is None:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
             self.model.config.pad_token_id = self.tokenizer.pad_token_id
+
         except Exception as e:
             print(f"Error loading model: {e}")
             raise
 
+    def load_model_llama_cpp(self):
+        print(f"Loading model '{self.model_name}' onto {self.device}...")
+        try:
+            from llama_cpp import Llama
+            
+            self.model = Llama.from_pretrained(
+                repo_id=self.model_name,
+                filename="Llama-3.2-3B-Instruct-f16.gguf",
+                n_threads=self.num_proc,
+                n_threads_batch=self.num_proc,
+                n_batch=2048, 
+                dtype="float16",
+                n_ctx=10128, 
+                verbose=False
+            )
+            self.tokenizer = None  # Assuming tokenizer is not needed for llama_cpp
+            print("Model loaded successfully.")
+
+        except ImportError:
+            print("llama_cpp library is not installed. Please install it to use this model.")
+            raise
+        except Exception as e:
+            print(f"Error loading model: {e}")
+            raise
     
-    def generate_stream(self, message_history: list, max_new_tokens: int = 500):
+    def generate_stream_llama_cpp(self, prompt: str, max_new_tokens: int = 500):
+        """
+        Generates a response from the model as a stream using llama_cpp.
+        
+        Args:
+            prompt (str): The input text to the model.
+            max_new_tokens (int): The maximum number of new tokens to generate.
+
+        Yields:
+            str: The next chunk of generated text.
+        """
+
+        sys_prompt=[
+            {
+                "role": "system",
+                "content": self._system_prompt()
+            }
+        ]
+
+        messages = sys_prompt + [{"role": "user", "content": prompt}]
+        
+        response_generator = self.model.create_chat_completion(
+            messages=messages,
+            max_tokens=max_new_tokens,
+            temperature=0.3,
+            stop=["<|eot_id|>"],
+            stream=True,  # Control whether to stream the response
+        )
+
+        for chunk in response_generator:
+            if 'choices' in chunk and len(chunk['choices']) > 0:
+                text = chunk['choices'][0].get('delta', {}).get('content', '')
+                if text:
+                    yield text
+
+    def generate_stream(self, prompt: str, max_new_tokens: int = 500):
+        """
+        Generates a response from the model as a stream.
+        
+        """
+        if self.inference_library == "transformers":
+            return self.generate_stream_transformers(prompt, max_new_tokens)
+        elif self.inference_library == "llama_cpp":
+            return self.generate_stream_llama_cpp(prompt, max_new_tokens)
+        else:
+            raise ValueError(f"Unsupported inference library: {self.inference_library}, please use 'transformers' or 'llama_cpp'.")
+
+    def generate_stream_transformers(self, message_history: list, max_new_tokens: int = 500):
         """
         Generates text in a streaming fashion.
         """
@@ -63,7 +167,7 @@ class GenModel:
             streamer=streamer,
             max_new_tokens=max_new_tokens,
             do_sample=True,
-            temperature=0.1, 
+            temperature=TEMPERATURE, 
             top_p=0.9,
             top_k=50,
             pad_token_id=self.tokenizer.eos_token_id
