@@ -13,3 +13,4 @@ dependencies:
       - transformers
       - accelerate
       - llama_cpp_python
+      - prompt_toolkit

@@ -15,7 +15,8 @@ class StiltsModel:
     """
 
     def __init__(self, 
-                 model_name: str = "RAShaw/stilts_gemma_2b_finetunned_prototype",
+                #  model_name: str = "RAShaw/stilts_gemma_2b_finetunned_prototype",
+                 model_name: str = "/scratch/Rhys/stilts_models/gemma-2b-finetuned/final_model",
                  inference_library: str = "llama_cpp", 
                  num_proc: int = 5, 
                  device: str = "cpu"):
@@ -67,7 +68,8 @@ class StiltsModel:
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.model_name, 
                 torch_dtype=torch.float16, 
-                device_map=self.device
+                device_map=self.device,
+                attn_implementation="eager"
             )
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
             print("Model loaded successfully.")
@@ -151,11 +153,12 @@ class StiltsModel:
             skip_prompt=True, 
             skip_special_tokens=True
         )
-        prompt = """<start_of_turn>user""" + prompt + """<end_of_turn>model"""
-        
+        prompt = """<bos><start_of_turn>user\n""" + prompt + """<end_of_turn>\n<start_of_turn>assistant\n"""
+        # print(prompt)
 
         inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
-
+        eos_token_id = self.tokenizer("<end_of_turn>")["input_ids"][-1]
+        # print(eos_token_id)
         generation_kwargs = dict(
             **inputs,
             streamer=streamer,
@@ -163,8 +166,8 @@ class StiltsModel:
             do_sample=True,
             temperature=0.3,
             top_p=0.95,
-            pad_token_id=107,
-            eos_token_id=107
+            pad_token_id=eos_token_id,
+            eos_token_id=eos_token_id
         )
 
         thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
