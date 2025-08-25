@@ -5,12 +5,16 @@ import logging
 import json
 import argparse
 
-from prompt_toolkit import prompt
+from prompt_toolkit import prompt, PromptSession
+from prompt_toolkit.history import InMemoryHistory
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 
 from stilts_model import StiltsModel
 from gen_model import GenModel 
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
+
+prompt_session_history = PromptSession()
 
 colors = {
     "red": "\033[91m",
@@ -68,7 +72,7 @@ class CLI:
 
     def stilts_model_loop(self):
         while True:
-            description = prompt("Enter a description for the STILTS command (or type 'exit' to quit): ")
+            description = prompt_session_history.prompt("Enter a description for the STILTS command (or type 'exit' to quit): ",auto_suggest=AutoSuggestFromHistory())
             if description.lower() in ['exit', 'quit', 'q']:
                 print(f"{colors['red']}Exiting Stilts Model Loop.{colors['reset']}")
                 break
@@ -105,7 +109,7 @@ class CLI:
                 continue
 
             elif self.input.lower() == 'save' or self.input.lower() == 's':
-                filename = prompt("Enter filename to save message history (without extension): ")
+                filename = prompt_session_history.prompt("Enter filename to save message history (without extension): ",auto_suggest=AutoSuggestFromHistory())
                 # save history as JSON 
                 with open(f"{filename}.json", "w") as f:
                     json.dump(self.message_history, f, indent=4)
@@ -190,7 +194,7 @@ class CLI:
 
     def get_input(self):
         """ask the user for a command"""
-        self.input = prompt(">> ")
+        self.input = prompt_session_history.prompt(">> ",auto_suggest=AutoSuggestFromHistory())
     
     def run(self):
         # start loop for the CLI
