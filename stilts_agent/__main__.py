@@ -161,7 +161,7 @@ class CLI:
                     auto_suggest=AutoSuggestFromHistory(),
                     completer=None,
                 )
-                # save history as JSON
+
                 with open(f"{filename}.json", "w") as f:
                     json.dump(self.message_history, f, indent=4)
                 print(
@@ -302,11 +302,6 @@ class CLI:
             print(f"{colors['red']}Error executing command: {e}{colors['reset']}")
             return e.stderr
 
-
-# def main():
-#     cli = CLI()
-#     cli.greating()
-#     cli.run()
 
 if __name__ == "__main__":
 

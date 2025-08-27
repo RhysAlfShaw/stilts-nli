@@ -15,3 +15,5 @@ dependencies:
       - llama_cpp_python
       - prompt_toolkit
       - bitsandbytes
+      - pytest
+      - pytest-mock
