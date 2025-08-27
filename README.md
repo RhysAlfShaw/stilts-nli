@@ -1,7 +1,7 @@
 # STILTS Natural Language Interface Commandline Tool.
 
 ## Dependencies.
-- STITLS (accesable via the command stilts in the terminal.) [link]
+- STILTS (accesable via the command stilts in the terminal.) [STILTS](https://www.star.bris.ac.uk/~mbt/stilts/ "https://www.star.bris.ac.uk/~mbt/stilts/")
 
 ## Installation
 
@@ -10,11 +10,14 @@ conda env create -f environment.yml
 conda activate stilts-agent
 ```
 
-to use:
+Test with:
 
 ```
 python stilts-agent
 ```
+
+
+## Usage
 
 On startup different arguments can be parsed to change which models will be used and what resources you
 want to allocate to the program. These include:
