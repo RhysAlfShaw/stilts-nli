@@ -42,10 +42,10 @@ To start STILTS-NLI with default f16 precision with a Cuda device.
 python stilts-nli
 ```
 
-To start STILTS-NLI with 5 cores f16 precision on a CPU.
+To start STILTS-NLI with 5 cores f16 precision on a CPU using llama_cpp for inference.
 
 ```bash
-python stilts-nli --num_proc 5 --device cpu
+python stilts-nli --num_proc 5 --device cpu --inference_library llama_cpp
 ```
 
 To just ask directly to the finetuned model on the GPU.

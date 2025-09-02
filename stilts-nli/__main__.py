@@ -1,3 +1,7 @@
+import setproctitle
+
+setproctitle.setproctitle("stilts-nli")
+
 ## main cli loop for stilts-agent.
 import subprocess
 import re
@@ -14,6 +18,8 @@ from stilts_model import StiltsModel
 from gen_model import GenModel
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
+
+# set proc title
 
 # disable tqdm logging
 

@@ -30,6 +30,8 @@ class GenModel:
                 "Warning: Running on CPU may be slow. Consider using llama_cpp for faster CPU inference or running on a GPU."
             )
             self.device = device
+            # set max number of threads for CPU
+            torch.set_num_threads(num_proc)
 
         elif device == "cuda":
             if torch.cuda.is_available():
@@ -41,6 +43,7 @@ class GenModel:
         else:
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
             if self.device == "cpu":
+
                 print(
                     "Warning: Running on CPU may be slow. Consider using llama_cpp for faster CPU inference or running on a GPU."
                 )

@@ -17,3 +17,4 @@ dependencies:
       - bitsandbytes
       - pytest
       - pytest-mock
+      - setproctitle
