@@ -2,7 +2,7 @@
 
 ## Dependencies.
 - STILTS (accesable via the command stilts in the terminal.) [STILTS](https://www.star.bris.ac.uk/~mbt/stilts/ "https://www.star.bris.ac.uk/~mbt/stilts/")
-- HuggingFace Account, access token and approval to use meta-llama/Llama-3.2-2B-Instruct model. [HuggingFace](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct "https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct")
+- HuggingFace Account, access token and approval to use meta-llama/Llama-3.2-2B-Instruct model. [HuggingFace](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct "https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct"). This 
 
 ## Installation
 
@@ -12,17 +12,51 @@ Create an access token for reading models from huggingface [security tokens docs
 
 ### Installing
 
+First clone this repoitory!
+
+```bash
+git clone git@github.com:RhysAlfShaw/stilts-nli.git
+cd stilts-nli
+```
+
+Using anaconda, create and activate the stilts-agent environment:
+
 ```bash
 conda env create -f environment.yml
 conda activate stilts-agent
 ```
 
-Test with:
+Test with this worked:
 
 ```
 python stilts-agent
 ```
 
+When first starting up the tool. It will download the models. This may take a few minutes.
+
+## Examples
+
+To start STILTS-NLI with default f16 precision with a Cuda device.
+
+```bash
+python stilts-nli
+```
+
+To start STILTS-NLI with 5 cores f16 precision on a CPU.
+
+```bash
+python stilts-nli --num_proc 5 --device cpu
+```
+
+To just ask directly to the finetuned model on the GPU.
+
+```bash
+python stilts-nli --stilts_model_only 
+```
+
+Here is an example of a conversation with STILTS-NLI.
+
+![STILTS-NLI Example](docs/example.png "STILTS-NLI Example")
 
 ## Usage
 

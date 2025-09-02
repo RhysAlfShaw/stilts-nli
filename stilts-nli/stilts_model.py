@@ -25,8 +25,8 @@ class StiltsModel:
 
     def __init__(
         self,
-        #  model_name: str = "RAShaw/stilts_gemma_2b_finetunned_prototype",
-        model_name: str = "/scratch/Rhys/stilts_models/gemma-2b-finetuned/final_model",
+        model_name: str = "RAShaw/gemma-2b-stilts-prototype",
+        # model_name: str = "/scratch/Rhys/stilts_models/gemma-2b-finetuned/final_model",
         inference_library: str = "llama_cpp",
         num_proc: int = 5,
         device: str = "cpu",
