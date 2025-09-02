@@ -2,8 +2,15 @@
 
 ## Dependencies.
 - STILTS (accesable via the command stilts in the terminal.) [STILTS](https://www.star.bris.ac.uk/~mbt/stilts/ "https://www.star.bris.ac.uk/~mbt/stilts/")
+- HuggingFace Account, access token and approval to use meta-llama/Llama-3.2-2B-Instruct model. [HuggingFace](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct "https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct")
 
 ## Installation
+
+### Hugginface model access
+
+Create an access token for reading models from huggingface [security tokens docs](https://huggingface.co/docs/hub/security-tokens "https://huggingface.co/docs/hub/security-tokens"), and add this to a file named access_token in this directory.
+
+### Installing
 
 ```bash
 conda env create -f environment.yml
