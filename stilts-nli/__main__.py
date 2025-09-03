@@ -8,6 +8,7 @@ import re
 import logging
 import json
 import argparse
+import os
 
 from prompt_toolkit import prompt, PromptSession
 from prompt_toolkit.history import InMemoryHistory
@@ -21,7 +22,12 @@ logging.getLogger("transformers").setLevel(logging.ERROR)
 
 # set proc title
 
-# disable tqdm logging
+# HF access token
+with open("access_token", "r") as f:
+    access_token = f.read().strip()
+
+os.environ["HF_TOKEN"] = access_token
+
 
 prompt_session_history = PromptSession()
 options_completer = WordCompleter(
