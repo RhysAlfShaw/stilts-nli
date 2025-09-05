@@ -19,19 +19,8 @@ jobs:
         activate-environment: stilts-agent
         environment-file: environment.yml
         auto-update-conda: true
-    - name: Debug environment
-      run: |
-        echo "Which python is active?"
-        which python
-
-        echo "Which pytest is active?"
-        which pytest
-
-        echo "What conda environments exist?"
-        conda info --envs
-        
-        echo "What is on the PATH?"
-        echo $PATH
+   
     - name: Run tests
       run: |
+        conda activate stilts-agent
         pytest
