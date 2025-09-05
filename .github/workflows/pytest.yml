@@ -21,7 +21,7 @@ jobs:
         auto-update-conda: true
    
     - name: Run tests
+      shell: bash -l {0}
       run: |
-        conda init
         conda activate stilts-agent
         pytest
