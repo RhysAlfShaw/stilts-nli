@@ -29,7 +29,7 @@ conda activate stilts-agent
 Test with this worked:
 
 ```
-python stilts-agent
+python stilts-nli
 ```
 
 When first starting up the tool. It will download the models. This may take a few minutes.
