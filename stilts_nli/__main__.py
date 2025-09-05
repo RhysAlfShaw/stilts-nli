@@ -17,6 +17,7 @@ from prompt_toolkit.completion import WordCompleter
 
 from .model.stilts_model import StiltsModel
 from .model.gen_model import GenModel
+from .model.parrot_model import ParrotModel
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
@@ -65,6 +66,7 @@ class CLI:
         stilts_model_only: bool = False,
         precision_stilts_model: str = "float16",
         precision_gen_model: str = "8bit",
+        test_mode: bool = False,
     ):
         self.precision_stilts_model = precision_stilts_model
         self.precision_gen_model = precision_gen_model
@@ -81,25 +83,40 @@ class CLI:
 
         self.device = device
 
-        self.stilts_model = StiltsModel(
-            inference_library=self.inference_library,
-            num_proc=self.num_proc,
-            device=self.device,
-            precision=self.precision_stilts_model,
-        )
+        if test_mode:
+            self.stilts_model = ParrotModel(
+                inference_library=self.inference_library,
+                num_proc=self.num_proc,
+                device=self.device,
+                precision=self.precision_stilts_model,
+            )
+        else:
+            self.stilts_model = StiltsModel(
+                inference_library=self.inference_library,
+                num_proc=self.num_proc,
+                device=self.device,
+                precision=self.precision_stilts_model,
+            )
         if self.stilts_model_only:
             print(
                 f"{colors['green']}Running in Stilts Model Only mode.{colors['reset']}"
             )
 
         else:
-
-            self.gen_model = GenModel(
-                inference_library=self.inference_library,
-                num_proc=self.num_proc,
-                device=self.device,
-                precision=self.precision_gen_model,
-            )
+            if test_mode:
+                self.gen_model = ParrotModel(
+                    inference_library=self.inference_library,
+                    num_proc=self.num_proc,
+                    device=self.device,
+                    precision=self.precision_gen_model,
+                )
+            else:
+                self.gen_model = GenModel(
+                    inference_library=self.inference_library,
+                    num_proc=self.num_proc,
+                    device=self.device,
+                    precision=self.precision_gen_model,
+                )
             print(
                 f"""
             {colors['green']}{colors['bold']}
