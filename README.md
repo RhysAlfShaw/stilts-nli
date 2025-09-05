@@ -1,5 +1,5 @@
 # STILTS Natural Language Interface Commandline Tool.
-
+[![Run tests](https://github.com/RhysAlfShaw/stilts-nli/actions/workflows/pytest.yml/badge.svg)](https://github.com/RhysAlfShaw/stilts-nli/actions/workflows/pytest.yml)
 ## Dependencies.
 - [STILTS](https://www.star.bris.ac.uk/~mbt/stilts/ "https://www.star.bris.ac.uk/~mbt/stilts/") (accesable via the command stilts in the terminal.) 
 - HuggingFace Account, access token and approval to use [meta-llama/Llama-3.2-3B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct "https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct") model.
