@@ -15,8 +15,8 @@ from prompt_toolkit.history import InMemoryHistory
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
 from prompt_toolkit.completion import WordCompleter
 
-from stilts_model import StiltsModel
-from gen_model import GenModel
+from model.stilts_model import StiltsModel
+from model.gen_model import GenModel
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
