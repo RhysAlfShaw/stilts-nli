@@ -23,8 +23,13 @@ logging.getLogger("transformers").setLevel(logging.ERROR)
 # set proc title
 
 # HF access token
-with open("access_token", "r") as f:
-    access_token = f.read().strip()
+try:  # developer mode
+    with open("secret_token", "r") as f:
+        access_token = f.read().strip()
+except FileNotFoundError:  # normal mode
+    with open("access_token", "r") as f:
+        access_token = f.read().strip()
+
 
 os.environ["HF_TOKEN"] = access_token
 
@@ -65,12 +70,14 @@ class CLI:
         stilts_model_only: bool = False,
         precision_stilts_model: str = "float16",
         precision_gen_model: str = "8bit",
+        force_download: bool = False,
     ):
         self.precision_stilts_model = precision_stilts_model
         self.precision_gen_model = precision_gen_model
         self.stilts_model_only = stilts_model_only
         self.inference_library = inference_library
         self.num_proc = num_proc
+        self.force_download = force_download
 
         print(
             f"Using inference library: {self.inference_library}, number of processes: {self.num_proc}, device: {device}"
@@ -86,6 +93,7 @@ class CLI:
             num_proc=self.num_proc,
             device=self.device,
             precision=self.precision_stilts_model,
+            force_download=self.force_download,
         )
         if self.stilts_model_only:
             print(
@@ -326,6 +334,13 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
+        "--update",
+        action="store_true",
+        default=False,
+        help="Update the STILTS models by re-downloading it from huggingface.",
+    )
+
+    parser.add_argument(
         "--num_proc", type=int, default=5, help="Number of processors for llama_cpp"
     )
 
@@ -374,6 +389,7 @@ if __name__ == "__main__":
         stilts_model_only=args.stilts_model_only,
         precision_stilts_model=args.precision_stilts_model,
         precision_gen_model=args.precision_gen_model,
+        force_download=args.update,
     )
     cli.greating()
     cli.run()

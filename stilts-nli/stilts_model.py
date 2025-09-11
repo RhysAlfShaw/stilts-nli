@@ -31,6 +31,7 @@ class StiltsModel:
         num_proc: int = 5,
         device: str = "cpu",
         precision: str = "8bit",
+        force_download: bool = False,
     ):
         """
         Initializes the Model class.
@@ -39,7 +40,7 @@ class StiltsModel:
             model_name (str): The path or Hugging Face repository ID of the model.
         """
         self.model_name = model_name
-
+        self.force_download = force_download
         if device == "cpu":
             print(
                 "Warning: Running on CPU may be slow. Consider using llama_cpp for faster CPU inference or running on a GPU."
@@ -102,12 +103,16 @@ class StiltsModel:
                 )
             else:
                 quantization_config = None
+            if self.force_download:
+                print("Forcing re-download of the model...")
+
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
                 torch_dtype=torch.float16,
                 device_map=self.device,
                 attn_implementation="eager",
                 quantization_config=quantization_config,
+                force_download=self.force_download,
             )
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
             print("Model loaded successfully.")
