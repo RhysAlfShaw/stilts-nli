@@ -15,7 +15,7 @@ def cli_instance():
         num_proc=4,
         device="cpu",
         stilts_model_only=False,
-        test_mode=True,
+        # test_mode=True,
     )
 
     return cli
