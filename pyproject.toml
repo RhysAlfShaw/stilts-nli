@@ -5,9 +5,9 @@ build-backend = "hatchling.build"
 [project]
 name = "stilts_nli"
 dynamic = ["version"]
-description = 'A natural Language to STILTS.'
+description = 'A natural Language Interface to STILTS.'
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.12"
 license = "GPL-3.0-or-later"
 keywords = []
 authors = [
@@ -16,10 +16,10 @@ authors = [
 classifiers = [
   "Development Status :: 4 - Beta",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
-  "Programming Language :: Python :: 3.11",
+  # "Programming Language :: Python :: 3.8",
+  # "Programming Language :: Python :: 3.9",
+  # "Programming Language :: Python :: 3.10",
+  # "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: Implementation :: CPython",
   "Programming Language :: Python :: Implementation :: PyPy",
@@ -64,6 +64,8 @@ exclude_lines = [
 # Specifies that the default environment is managed by Conda.
 # Requires the `hatch-conda` plugin to be installed.
 type = "conda"
-
 # Tells hatch-conda to use your environment.yml to build the environment.
 environment-file = "environment.yml"
+
+[project.scripts]
+stilts-nli = "stilts_nli.__main__:main"

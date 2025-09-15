@@ -339,8 +339,7 @@ class CLI:
             return e.stderr
 
 
-if __name__ == "__main__":
-
+def main():
     parser = argparse.ArgumentParser(description="Stilts Agent CLI")
     parser.add_argument(
         "--inference_library",
@@ -409,3 +408,7 @@ if __name__ == "__main__":
     )
     cli.greating()
     cli.run()
+
+
+if __name__ == "__main__":
+    main()
