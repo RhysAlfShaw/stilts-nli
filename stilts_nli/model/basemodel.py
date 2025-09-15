@@ -23,7 +23,7 @@ class BaseModel(ABC):
     def __init__(
         self,
         model_name: str,
-        inference_library: str = "llama_cpp",
+        inference_library: str = "transformers",
         num_proc: int = 5,
         device: str = "cpu",
         precision: str = "8bit",

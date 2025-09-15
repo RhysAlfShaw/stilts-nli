@@ -7,7 +7,7 @@ from .basemodel import (
     torch,
 )
 
-TEMPERATURE = 0.1
+TEMPERATURE = 0.9
 
 
 class GenModel(BaseModel):
