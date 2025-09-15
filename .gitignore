@@ -3,3 +3,4 @@
 secret_token
 dist/
 test.md
+.pypirc
