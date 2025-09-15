@@ -15,21 +15,27 @@ authors = [
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
-  "Programming Language :: Python",
-  # "Programming Language :: Python :: 3.8",
-  # "Programming Language :: Python :: 3.9",
-  # "Programming Language :: Python :: 3.10",
-  # "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
+  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
 ]
-dependencies = []
+
+# Core runtime dependencies
+dependencies = [
+    "numpy",
+    "torch",
+    "transformers",
+    "accelerate",
+    "llama_cpp_python",
+    "prompt_toolkit",
+    "bitsandbytes",
+    "setproctitle",
+]
 
 [project.urls]
-Documentation = "https://github.com/Rhys Shaw/stilts-nli#readme"
-Issues = "https://github.com/Rhys Shaw/stilts-nli/issues"
-Source = "https://github.com/Rhys Shaw/stilts-nli"
+Documentation = "https://github.com/RhysAlfShaw/stilts-nli#readme"
+Issues = "https://github.com/RhysAlfShaw/stilts-nli/issues"
+Source = "https://github.com/RhysAlfShaw/stilts-nli"
 
 [tool.hatch.version]
 path = "stilts_nli/__about__.py"
@@ -69,3 +75,14 @@ environment-file = "environment.yml"
 
 [project.scripts]
 stilts-nli = "stilts_nli.__main__:main"
+
+# Add this section to configure publishing repositories
+[tool.hatch.publish]
+
+# Defines the repository named "test"
+[tool.hatch.publish.test]
+url = "https://test.pypi.org/legacy/"
+
+# Defines the repository named "main"
+[tool.hatch.publish.main]
+url = "https://upload.pypi.org/legacy/"
