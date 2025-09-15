@@ -64,6 +64,7 @@ def test_cli_initialization(
         stilts_model_only=stilts_model_only,
         precision_stilts_model=precision_stilts_model,
         precision_gen_model=precision_gen_model,
+        force_download=False,
         test_mode=True,
     )
 

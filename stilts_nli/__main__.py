@@ -90,12 +90,20 @@ class CLI:
 
         self.device = device
 
-        self.stilts_model = StiltsModel(
-            inference_library=self.inference_library,
-            num_proc=self.num_proc,
-            device=self.device,
-            precision=self.precision_stilts_model,
-        )
+        if test_mode:
+            self.stilts_model = ParrotModel(
+                inference_library=self.inference_library,
+                num_proc=self.num_proc,
+                device=self.device,
+                precision=self.precision_stilts_model,
+            )
+        else:
+            self.stilts_model = StiltsModel(
+                inference_library=self.inference_library,
+                num_proc=self.num_proc,
+                device=self.device,
+                precision=self.precision_stilts_model,
+            )
         if self.stilts_model_only:
             print(
                 f"{colors['green']}Running in Stilts Model Only mode.{colors['reset']}"
