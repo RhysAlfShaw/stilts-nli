@@ -45,6 +45,9 @@ class BaseModel(ABC):
         if requested_device == "cuda" and torch.cuda.is_available():
             self.device = "cuda"
             print("Using GPU for inference.")
+        elif requested_device == "mps" and torch.backends.mps.is_available():
+            self.device = "mps"
+            print("Using Apple Silicon GPU (MPS) for inference.")
         else:
             if requested_device == "cuda":
                 print("CUDA is not available, falling back to CPU.")
