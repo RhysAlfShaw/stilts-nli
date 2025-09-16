@@ -47,6 +47,10 @@ Test with this worked:
 python stilts-nli
 ```
 
+## Using quantised models with transformers
+
+To use the 8bit and 4bit models with transformers then you also need to install bitsandbytes. This package required a cuda device, so if you have limited memory use llama_cpp_python for inference on use only the stilts model.
+
 ## Installing Llama_cpp_python
 
 If you run into trouble installing `llama_cpp_python` and are on a linux machine it is likely a problem with C compilers. A work around is installing (with conda and also installing packages `gcc` and `gxx`).
