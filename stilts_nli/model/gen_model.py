@@ -17,7 +17,7 @@ class GenModel(BaseModel):
 
     def __init__(self, **kwargs):
         # Set default model name if not provided
-        kwargs.setdefault("model_name", "meta-llama/Llama-3.2-3B-Instruct")
+        kwargs.setdefault("model_name", "RAShaw/llama-3.2-3B-instruct")
         super().__init__(**kwargs)
 
     def load_model_transformers(self):
