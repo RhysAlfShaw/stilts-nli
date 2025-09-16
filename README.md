@@ -1,11 +1,12 @@
 # STILTS Natural Language Interface Commandline Tool.
 [![Run tests](https://github.com/RhysAlfShaw/stilts-nli/actions/workflows/pytest.yml/badge.svg)](https://github.com/RhysAlfShaw/stilts-nli/actions/workflows/pytest.yml)
+[![codecov](https://codecov.io/gh/RhysAlfShaw/stilts-nli/graph/badge.svg?token=E1FQ94JAHN)](https://codecov.io/gh/RhysAlfShaw/stilts-nli)
 [![PyPI version](https://badge.fury.io/py/stilts_nli.svg)](https://badge.fury.io/py/stilts_nli)
 ## Dependencies.
 [STILTS](https://www.star.bris.ac.uk/~mbt/stilts/ "https://www.star.bris.ac.uk/~mbt/stilts/") (accesable via the command stilts in the terminal.) This only limits the execution of the generated command.
 ## Installation
 
-STILTS-NLI can be installed via pip.
+STILTS-NLI can be installed via pip with atleast python 3.12
 
 ```bash
 pip install stilts_nli
