@@ -21,7 +21,6 @@ from stilts_nli.model.parrot_model import ParrotModel
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
-
 prompt_session_history = PromptSession()
 options_completer = WordCompleter(
     [
