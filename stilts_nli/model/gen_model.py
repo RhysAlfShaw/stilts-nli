@@ -1,128 +1,59 @@
-from threading import Thread
-
-from transformers import (
+from .basemodel import (
+    BaseModel,
     AutoModelForCausalLM,
     AutoTokenizer,
     TextIteratorStreamer,
-    BitsAndBytesConfig,
+    Thread,
+    torch,
 )
 
-import torch
+TEMPERATURE = 0.9
 
 
-TEMPERATURE = 0.1
+class GenModel(BaseModel):
+    """
+    A general-purpose instruction-following model based on Llama-3.2.
+    """
 
-
-class GenModel:
-    def __init__(
-        self,
-        model_name: str = "meta-llama/Llama-3.2-3B-Instruct",
-        inference_library: str = "llama_cpp",
-        num_proc: int = 5,
-        device: str = "cpu",
-        precision: str = "8bit",
-    ):
-
-        self.model_name = model_name
-
-        if device == "cpu":
-            print(
-                "Warning: Running on CPU may be slow. Consider using llama_cpp for faster CPU inference or running on a GPU."
-            )
-            self.device = device
-            # set max number of threads for CPU
-            torch.set_num_threads(num_proc)
-
-        elif device == "cuda":
-            if torch.cuda.is_available():
-                print("Using GPU for inference.")
-                self.device = device
-            else:
-                print("CUDA is not available, falling back to CPU.")
-                self.device = "cpu"
-        else:
-            self.device = "cuda" if torch.cuda.is_available() else "cpu"
-            if self.device == "cpu":
-
-                print(
-                    "Warning: Running on CPU may be slow. Consider using llama_cpp for faster CPU inference or running on a GPU."
-                )
-
-        self.device = device
-        self.num_proc = num_proc
-        self.model = None
-        self.tokenizer = None
-        self.inference_library = inference_library
-
-        self.precision = precision
-        if self.precision not in ["float16", "8bit", "4bit"]:
-            raise ValueError("Precision must be one of 'float16', '8bit', or '4bit'.")
-
-        if self.inference_library == "transformers":
-            self.load_model_transformers()
-        elif self.inference_library == "llama_cpp":
-            self.model_name = "bartowski/Llama-3.2-3B-Instruct-GGUF"
-            self.load_model_llama_cpp()
-        else:
-            raise ValueError(
-                f"Unsupported inference library: {self.inference_library}, please use 'transformers' or 'llama_cpp'."
-            )
+    def __init__(self, **kwargs):
+        # Set default model name if not provided
+        kwargs.setdefault("model_name", "meta-llama/Llama-3.2-3B-Instruct")
+        super().__init__(**kwargs)
 
     def load_model_transformers(self):
         print(f"Loading model '{self.model_name}' onto {self.device}...")
         try:
-
-            if self.precision == "8bit":
-
-                quantization_config = BitsAndBytesConfig(
-                    load_in_8bit=True,
-                )
-
-            elif self.precision == "4bit":
-
-                quantization_config = BitsAndBytesConfig(
-                    load_in_4bit=True,
-                    bnb_4bit_quant_type="nf4",
-                    bnb_4bit_compute_type=torch.float16,
-                    bnb_4bit_use_double_quant=True,
-                )
-            else:
-                quantization_config = None
-
+            quantization_config = self._get_quantization_config()
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
-                # torch_dtype=torch.float16,
                 device_map=self.device,
                 quantization_config=quantization_config,
             )
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            print("Model loaded successfully.")
+
             if self.tokenizer.pad_token is None:
                 self.tokenizer.pad_token = self.tokenizer.eos_token
             self.model.config.pad_token_id = self.tokenizer.pad_token_id
-
+            print("Model loaded successfully.")
         except Exception as e:
             print(f"Error loading model: {e}")
             raise
 
     def load_model_llama_cpp(self):
-        print(f"Loading model '{self.model_name}' onto {self.device}...")
+        print("Loading model 'bartowski/Llama-3.2-3B-Instruct-GGUF'...")
         try:
             from llama_cpp import Llama
 
             self.model = Llama.from_pretrained(
-                repo_id=self.model_name,
+                repo_id="bartowski/Llama-3.2-3B-Instruct-GGUF",
                 filename="Llama-3.2-3B-Instruct-f16.gguf",
                 n_threads=self.num_proc,
                 n_threads_batch=self.num_proc,
                 n_batch=2048,
-                dtype="float16",
                 n_ctx=10128,
                 verbose=False,
             )
-            self.tokenizer = None  # Assuming tokenizer is not needed for llama_cpp
             print("Model loaded successfully.")
-
         except ImportError:
             print(
                 "llama_cpp library is not installed. Please install it to use this model."
@@ -132,68 +63,24 @@ class GenModel:
             print(f"Error loading model: {e}")
             raise
 
-    def generate_stream_llama_cpp(self, prompt: str, max_new_tokens: int = 500):
-        """
-        Generates a response from the model as a stream using llama_cpp.
-
-        Args:
-            prompt (str): The input text to the model.
-            max_new_tokens (int): The maximum number of new tokens to generate.
-
-        Yields:
-            str: The next chunk of generated text.
-        """
-
-        sys_prompt = [{"role": "system", "content": self._system_prompt()}]
-
-        messages = sys_prompt + [{"role": "user", "content": prompt}]
-
-        response_generator = self.model.create_chat_completion(
-            messages=messages,
-            max_tokens=max_new_tokens,
-            temperature=0.3,
-            stop=["<|eot_id|>"],
-            stream=True,  # Control whether to stream the response
-        )
-
-        for chunk in response_generator:
-            if "choices" in chunk and len(chunk["choices"]) > 0:
-                text = chunk["choices"][0].get("delta", {}).get("content", "")
-                if text:
-                    yield text
-
-    def generate_stream(self, prompt: str, max_new_tokens: int = 500):
-        """
-        Generates a response from the model as a stream.
-
-        """
-        if self.inference_library == "transformers":
-            return self.generate_stream_transformers(prompt, max_new_tokens)
-        elif self.inference_library == "llama_cpp":
-            return self.generate_stream_llama_cpp(prompt, max_new_tokens)
-        else:
-            raise ValueError(
-                f"Unsupported inference library: {self.inference_library}, please use 'transformers' or 'llama_cpp'."
-            )
-
-    def generate_stream_transformers(
-        self, message_history: list, max_new_tokens: int = 500
-    ):
-        """
-        Generates text in a streaming fashion.
-        """
-
-        sys_prompt = [{"role": "system", "content": self._system_prompt()}]
-        messages = sys_prompt + message_history
+    # Note: In your original code, this took `message_history`.
+    # To conform to the base class, I've changed it to take `prompt`.
+    # You may want to adjust the base class if `message_history` is required.
+    def generate_stream_transformers(self, prompt: str, max_new_tokens: int = 500):
         streamer = TextIteratorStreamer(
             self.tokenizer, skip_prompt=True, skip_special_tokens=True
         )
+        # Assuming `prompt` is the latest user message.
+        messages = [
+            {"role": "system", "content": self._system_prompt()},
+            {"role": "user", "content": prompt},
+        ]
 
         prompt_templated = self.tokenizer.apply_chat_template(
             messages, tokenize=False, add_generation_prompt=True
         )
-
         inputs = self.tokenizer(prompt_templated, return_tensors="pt").to(self.device)
+
         generation_kwargs = dict(
             **inputs,
             streamer=streamer,
@@ -207,9 +94,27 @@ class GenModel:
 
         thread = Thread(target=self.model.generate, kwargs=generation_kwargs)
         thread.start()
+        return streamer
 
-        for new_text in streamer:
-            yield new_text
+    def generate_stream_llama_cpp(self, prompt: str, max_new_tokens: int = 500):
+        messages = [
+            {"role": "system", "content": self._system_prompt()},
+            {"role": "user", "content": prompt},
+        ]
+
+        response_generator = self.model.create_chat_completion(
+            messages=messages,
+            max_tokens=max_new_tokens,
+            temperature=0.3,
+            stop=["<|eot_id|>"],
+            stream=True,
+        )
+
+        for chunk in response_generator:
+            if "choices" in chunk and len(chunk["choices"]) > 0:
+                text = chunk["choices"][0].get("delta", {}).get("content", "")
+                if text:
+                    yield text
 
     def _system_prompt(self):
 

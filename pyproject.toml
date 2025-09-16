@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "stilts_nli"
+dynamic = ["version"]
+description = 'A natural Language Interface to STILTS.'
+readme = "README.md"
+requires-python = ">=3.12"
+license = "GPL-3.0-or-later"
+keywords = []
+authors = [
+  { name = "Rhys Shaw", email = "rhysc3p0@gmail.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+]
+
+# Core runtime dependencies
+dependencies = [
+    "numpy",
+    "torch",
+    "transformers",
+    "accelerate",
+    "llama_cpp_python",
+    "prompt_toolkit",
+    "bitsandbytes",
+    "setproctitle",
+]
+
+[project.urls]
+Documentation = "https://github.com/RhysAlfShaw/stilts-nli#readme"
+Issues = "https://github.com/RhysAlfShaw/stilts-nli/issues"
+Source = "https://github.com/RhysAlfShaw/stilts-nli"
+
+[tool.hatch.version]
+path = "stilts_nli/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/stilts_nli tests}"
+
+[tool.coverage.run]
+source_pkgs = ["stilts_nli", "tests"]
+branch = true
+parallel = true
+omit = [
+  "stilts_nli/__about__.py",
+]
+
+[tool.coverage.paths]
+stilts_nli = ["stilts_nli", "*/stilts-nli/src/stilts_nli"]
+tests = ["tests", "*/stilts-nli/tests"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.hatch.envs.default]
+# Specifies that the default environment is managed by Conda.
+# Requires the `hatch-conda` plugin to be installed.
+type = "conda"
+# Tells hatch-conda to use your environment.yml to build the environment.
+environment-file = "environment.yml"
+
+[project.scripts]
+stilts-nli = "stilts_nli.__main__:main"
+
+# Add this section to configure publishing repositories
+[tool.hatch.publish]
+
+# Defines the repository named "test"
+[tool.hatch.publish.test]
+url = "https://test.pypi.org/legacy/"
+
+# Defines the repository named "main"
+[tool.hatch.publish.main]
+url = "https://upload.pypi.org/legacy/"

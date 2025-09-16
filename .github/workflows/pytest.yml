@@ -1,0 +1,27 @@
+name: Run tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  pytest:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Conda environment
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        activate-environment: stilts-agent
+        environment-file: environment.yml
+        auto-update-conda: true
+   
+    - name: Run tests
+      shell: bash -l {0}
+      run: |
+        conda activate stilts-agent
+        pytest

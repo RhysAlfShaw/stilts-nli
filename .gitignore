@@ -1,3 +1,7 @@
 *.pyc
 *__pycache__/
 secret_token
+dist/
+test.md
+.pypirc
+.pypirc-test
