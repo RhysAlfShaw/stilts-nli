@@ -21,20 +21,6 @@ from stilts_nli.model.parrot_model import ParrotModel
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
-# set proc title
-
-# HF access token
-try:  # developer mode
-    with open("secret_token", "r") as f:
-        access_token = f.read().strip()
-except FileNotFoundError:  # normal mode
-    with open("access_token", "r") as f:
-        access_token = f.read().strip()
-
-
-os.environ["HF_TOKEN"] = access_token
-
-
 prompt_session_history = PromptSession()
 options_completer = WordCompleter(
     [
