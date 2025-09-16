@@ -28,7 +28,6 @@ dependencies = [
     "accelerate",
     "llama_cpp_python",
     "prompt_toolkit",
-    "bitsandbytes",
     "setproctitle",
 ]
 

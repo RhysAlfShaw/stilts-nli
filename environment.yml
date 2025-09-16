@@ -14,7 +14,7 @@ dependencies:
       - accelerate
       - llama_cpp_python
       - prompt_toolkit
-      - bitsandbytes
+      # - bitsandbytes [only_linux]
       - pytest
       - pytest-mock
       - setproctitle

@@ -8,11 +8,11 @@
 STILTS-NLI can be installed via pip.
 
 ```bash
-pip install stilts-nli
+pip install stilts_nli
 ```
 We can then run the command.
 ```bash
-stilts_nli
+stilts-nli
 ```
 
 When first starting up the tool. It will download the models. This may take a few minutes.

@@ -372,7 +372,7 @@ def main():
     parser.add_argument(
         "--precision",
         type=str,
-        default="8bit",
+        default="float16",
         help="Precision for both models (float16, 8bit, or 4bit)",
     )
 
