@@ -71,7 +71,7 @@ class CLI:
             f"Using inference library: {self.inference_library}, number of processes: {self.num_proc}, device: {device}"
         )
 
-        if device not in ["cpu", "cuda"]:
+        if device not in ["cpu", "cuda", "mps"]:
             raise ValueError("Device must be 'cpu' or 'cuda'.")
 
         self.device = device
@@ -346,7 +346,10 @@ def main():
     )
 
     parser.add_argument(
-        "--device", type=str, default="cuda", help="Device to run on (cpu or cuda)"
+        "--device",
+        type=str,
+        default="cuda",
+        help="Device to run on (cpu or cuda or mps (mac))",
     )
 
     parser.add_argument(
