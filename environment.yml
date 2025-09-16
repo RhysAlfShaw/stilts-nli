@@ -4,8 +4,8 @@ channels:
   - conda-forge
 dependencies:
   - python=3.12
-  - gcc 
-  - gxx
+  - gcc [linux-64]
+  - gxx [linux-64]
   - pip
   - pip:
       - numpy

@@ -2,18 +2,25 @@
 [![Run tests](https://github.com/RhysAlfShaw/stilts-nli/actions/workflows/pytest.yml/badge.svg)](https://github.com/RhysAlfShaw/stilts-nli/actions/workflows/pytest.yml)
 [![PyPI version](https://badge.fury.io/py/stilts_nli.svg)](https://badge.fury.io/py/stilts_nli)
 ## Dependencies.
-- [STILTS](https://www.star.bris.ac.uk/~mbt/stilts/ "https://www.star.bris.ac.uk/~mbt/stilts/") (accesable via the command stilts in the terminal.) 
-- HuggingFace Account, access token and approval to use [meta-llama/Llama-3.2-3B-Instruct](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct "https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct") model.
-- [Conda](https://www.anaconda.com/docs/getting-started/anaconda/install) installation.
+[STILTS](https://www.star.bris.ac.uk/~mbt/stilts/ "https://www.star.bris.ac.uk/~mbt/stilts/") (accesable via the command stilts in the terminal.) This only limits the execution of the generated command.
 ## Installation
 
-### Hugginface model access
+STILTS-NLI can be installed via pip.
 
-Create an access token for reading models from huggingface [security tokens docs](https://huggingface.co/docs/hub/security-tokens "https://huggingface.co/docs/hub/security-tokens"), and add this to a file named access_token in this directory.
+```bash
+pip install stilts-nli
+```
+We can then run the command.
+```bash
+stilts_nli
+```
 
-### Installing
+When first starting up the tool. It will download the models. This may take a few minutes.
 
-First clone this repoitory!
+
+### Manual installation (conda)
+
+Alternatively it can be installed manually through conda.
 
 ```bash
 git clone git@github.com:RhysAlfShaw/stilts-nli.git
@@ -29,30 +36,32 @@ conda activate stilts-agent
 
 Test with this worked:
 
-```
+```bash
 python stilts-nli
 ```
 
-When first starting up the tool. It will download the models. This may take a few minutes.
+## Installing Llama_cpp_python
+
+If you run into trouble installing `llama_cpp_python` and are on a linux machine it is likely a problem with C compilers. A work around is installing (with conda and also installing packages `gcc` and `gxx`).
 
 ## Examples
 
 To start STILTS-NLI with default f16 precision with a Cuda device.
 
 ```bash
-python stilts-nli
+stilts-nli
 ```
 
 To start STILTS-NLI with 5 cores f16 precision on a CPU using llama_cpp for inference.
 
 ```bash
-python stilts-nli --num_proc 5 --device cpu --inference_library llama_cpp
+stilts-nli --num_proc 5 --device cpu --inference_library llama_cpp
 ```
 
 To just ask directly to the finetuned model on the GPU.
 
 ```bash
-python stilts-nli --stilts_model_only 
+stilts-nli --stilts_model_only 
 ```
 
 Here is an example of a conversation with STILTS-NLI.
