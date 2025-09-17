@@ -45,6 +45,7 @@ colors = {
     "reset": "\033[0m",
     "bold": "\033[1m",
     "underline": "\033[4m",
+    "italic": "\033[3m",
 }
 
 
@@ -92,7 +93,19 @@ class CLI:
             )
         if self.stilts_model_only:
             print(
-                f"{colors['green']}Running in Stilts Model Only mode.{colors['reset']}"
+                f"""
+            {colors['green']}{colors['bold']}
+            Welcome to the Stilts Natural Language Interface! (Stilts Model Only Mode)
+            {colors['reset']}
+            This tool allows you to generate STILTS commands and execute them using a natural language.
+            You can ask the model to create commands based on your prompts.
+            {colors['bold']}Type 'help/h' for guidence, 'quit/q' to exit.{colors['bold']}
+
+            Need more help? Visit: {colors['blue']}{colors['underline']}{colors["bold"]}https://www.star.bristol.ac.uk/~mbt/stilts/{colors['reset']}
+
+            {colors['italic']}LLM generated commands should be checked before execution.{colors['reset']}   
+
+            """
             )
 
         else:
@@ -120,6 +133,10 @@ class CLI:
             Once it generates a command ask it to execute it.{colors['bold']}
             Type 'help/h' for guidence, 'clear/c' to clear the message history, 'quit/q' to exit.{colors['reset']}
             Save message history to a file type 'save/s'.
+            Need more help? Visit: {colors['blue']}{colors['underline']}{colors["bold"]}https://www.star.bristol.ac.uk/~mbt/stilts/{colors['reset']} 
+            
+            {colors['italic']}LLM generated commands should be checked before execution.{colors['reset']}
+            
             """
             )
             self.message_history = []
@@ -135,7 +152,7 @@ class CLI:
         )
         while True:
             description = prompt_session_history.prompt(
-                "Enter a description for the STILTS command (or type 'exit' to quit): ",
+                ">> ",
                 auto_suggest=AutoSuggestFromHistory(),
                 completer=options_completer_stilts,
             )
