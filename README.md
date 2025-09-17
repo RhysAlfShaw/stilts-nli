@@ -9,7 +9,7 @@
 STILTS-NLI can be installed via pip with atleast python 3.12
 
 ```bash
-pip install stilts_nli
+pip install stilts-nli
 ```
 We can then run the command.
 ```bash
