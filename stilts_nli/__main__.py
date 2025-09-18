@@ -162,7 +162,7 @@ class CLI:
 
             stilts_command = self.stilts_model.generate_stream(description)
             full_command = ""
-            print("\nGenerated STILTS Command:\n")
+            print("\nResponse:\n")
             for chunk in stilts_command:
                 print(chunk, end="", flush=True)
                 full_command += chunk
