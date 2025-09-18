@@ -6,7 +6,7 @@
 [STILTS](https://www.star.bris.ac.uk/~mbt/stilts/ "https://www.star.bris.ac.uk/~mbt/stilts/") (accesable via the command stilts in the terminal.) This only limits the execution of the generated command.
 ## Installation
 
-STILTS-NLI can be installed via pip with atleast python 3.12
+STILTS-NLI can be installed via pip with atleast python 3.12. It is recomended this is done in a virtual environment or conda environment.
 
 ```bash
 pip install stilts-nli
@@ -55,6 +55,30 @@ To use the 8bit and 4bit models with transformers then you also need to install 
 ## Installing Llama_cpp_python
 
 If you run into trouble installing `llama_cpp_python` and are on a linux machine it is likely a problem with C compilers. A work around is installing (with conda and also installing packages `gcc` and `gxx`).
+
+## Docker 
+
+If you dont want to or cannot install locally then use the local dockerfile to use the tool. You can do this by
+cloning this directory.
+```
+git clone https://github.com/RhysAlfShaw/stilts-nli.git
+cd stilts-nli
+```
+Now build the container
+
+```bash
+docker compose up -d
+```
+Lets go into the running container and lanch stilts-nli
+
+```bash
+docker exec -it stilts-nli /bin/bash -c "stilts-nli"
+```
+When you are finished rememeber to stop the container.
+
+```
+docker compose down
+```
 
 ## Examples
 

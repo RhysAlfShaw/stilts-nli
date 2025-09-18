@@ -1,0 +1,17 @@
+services:
+  dev-environment:
+    container_name: stilts-nli
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    command: sleep infinity
+    tty: true
+    build:
+      context: .
+      dockerfile: dockerfile
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    runtime: nvidia
