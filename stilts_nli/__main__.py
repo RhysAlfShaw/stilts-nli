@@ -18,21 +18,13 @@ from prompt_toolkit.completion import WordCompleter
 from stilts_nli.model.stilts_model import StiltsModel
 from stilts_nli.model.gen_model import GenModel
 from stilts_nli.model.parrot_model import ParrotModel
+from completion import CombinedCompleter
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
-prompt_session_history = PromptSession()
-options_completer = WordCompleter(
-    [
-        "exit",
-        "quit",
-        "help",
-        "clear",
-        "save",
-    ],
-    ignore_case=True,
-)
 
+prompt_session_history = PromptSession()
+options_completer = CombinedCompleter()
 
 colors = {
     "red": "\033[91m",
@@ -142,14 +134,7 @@ class CLI:
             self.message_history = []
 
     def stilts_model_loop(self):
-        options_completer_stilts = WordCompleter(
-            [
-                "exit",
-                "quit",
-                "q",
-            ],
-            ignore_case=True,
-        )
+        options_completer_stilts = CombinedCompleter(reduced_option=True)
         while True:
             description = prompt_session_history.prompt(
                 ">> ",
