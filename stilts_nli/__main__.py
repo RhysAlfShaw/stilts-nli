@@ -18,7 +18,7 @@ from prompt_toolkit.completion import WordCompleter
 from stilts_nli.model.stilts_model import StiltsModel
 from stilts_nli.model.gen_model import GenModel
 from stilts_nli.model.parrot_model import ParrotModel
-from completion import CombinedCompleter
+from stilts_nli.utils.completion import CombinedCompleter
 
 logging.getLogger("transformers").setLevel(logging.ERROR)
 
