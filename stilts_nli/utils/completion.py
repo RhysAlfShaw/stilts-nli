@@ -24,6 +24,7 @@ class CombinedCompleter(Completer):
                 "help",
                 "clear",
                 "save",
+                "desc",
             ]
         local_files = [
             f

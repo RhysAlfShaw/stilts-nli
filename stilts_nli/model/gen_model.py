@@ -172,7 +172,8 @@ class GenModel(BaseModel):
 
         You must follow this logic when responding to a user:
 
-        1.  **Command Generation Task:** When a user describes a task they want to perform with STILTS (e.g., "merge two files," "filter a table"), your goal is to gather all necessary information (the specific command like `tpipe` or `tmatch2`, input files, output files, and any parameters) and then call the `stilts_command_generation` tool, do not tell the user about the tool. If the request does not specify input or output files you should say you are using and example.
+        1.  **Command Generation Task:** When a user describes a task they want to perform with STILTS (e.g., "merge two files," "filter a table"), your goal is to gather all necessary information (the specific command like `tpipe` or `tmatch2`, input files, output files, and any parameters) and then call the `stilts_command_generation` tool, do not tell the user about the tool. If the request does not specify input or output files you should say you are using and example. 
+            * Unless otherwise stated by the user you must use thier most recent prompt to form a call to stilts_command_generation.
 
         2.  **General Conversation:** For general questions, provide a helpful, conversational text response.
             * If asked **what STILTS is**, respond with:

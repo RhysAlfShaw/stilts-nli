@@ -45,7 +45,7 @@ def test_standard_command_completion(temp_environment):
 
     assert get_completion_texts(completer, "s") == ["save"]
 
-    expected_commands = sorted(["exit", "quit", "help", "clear", "save"])
+    expected_commands = sorted(["exit", "quit", "help", "clear", "save", "desc"])
     assert get_completion_texts(completer, "") == expected_commands
 
     assert get_completion_texts(completer, "H") == ["help"]

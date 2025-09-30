@@ -45,7 +45,7 @@ conda activate stilts-agent
 Test with this worked:
 
 ```bash
-python stilts-nli
+python -m stilts_nli
 ```
 
 ## Using quantised models with transformers
