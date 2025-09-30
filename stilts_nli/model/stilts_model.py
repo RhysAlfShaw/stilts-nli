@@ -15,8 +15,10 @@ class StiltsModel(BaseModel):
     A fine-tuned model for generating STILTS commands.
     """
 
-    def __init__(self, **kwargs):
-        kwargs.setdefault("model_name", "RAShaw/gemma-2b-stilts-prototype")
+    def __init__(self, model_name=None, **kwargs):
+        if model_name is None:
+            model_name = "RAShaw/gemma-2b-stilts-prototype"
+        kwargs.setdefault("model_name", model_name)
         super().__init__(**kwargs)
 
     def load_model_transformers(self):

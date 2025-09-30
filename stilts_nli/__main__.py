@@ -51,6 +51,7 @@ class CLI:
         precision_stilts_model: str = "float16",
         precision_gen_model: str = "8bit",
         force_download: bool = False,
+        local_model_path: str = None,
         test_mode: bool = False,
     ):
         self.precision_stilts_model = precision_stilts_model
@@ -60,6 +61,7 @@ class CLI:
         self.num_proc = num_proc
         self.force_download = force_download
         self.stilts_desc = True  # default on.
+        self.local_model_path = local_model_path
 
         print(
             f"Using inference library: {self.inference_library}, number of processes: {self.num_proc}, device: {device}"
@@ -79,11 +81,13 @@ class CLI:
             )
         else:
             self.stilts_model = StiltsModel(
+                model_name=local_model_path,
                 inference_library=self.inference_library,
                 num_proc=self.num_proc,
                 device=self.device,
                 precision=self.precision_stilts_model,
             )
+
         if self.stilts_model_only:
             print(
                 f"""
@@ -356,6 +360,13 @@ def main():
     )
 
     parser.add_argument(
+        "--local_model_path",
+        type=str,
+        default=None,
+        help="For Model Testing only. Loads local model as stilts_model.",
+    )
+
+    parser.add_argument(
         "--update",
         action="store_true",
         default=False,
@@ -415,6 +426,7 @@ def main():
         precision_stilts_model=args.precision_stilts_model,
         precision_gen_model=args.precision_gen_model,
         force_download=args.update,
+        local_model_path=args.local_model_path,
     )
     cli.greating()
     cli.run()
