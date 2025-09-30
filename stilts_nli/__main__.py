@@ -59,6 +59,7 @@ class CLI:
         self.inference_library = inference_library
         self.num_proc = num_proc
         self.force_download = force_download
+        self.stilts_desc = True  # default on.
 
         print(
             f"Using inference library: {self.inference_library}, number of processes: {self.num_proc}, device: {device}"
@@ -91,7 +92,7 @@ class CLI:
             {colors['reset']}
             This tool allows you to generate STILTS commands and execute them using a natural language.
             You can ask the model to create commands based on your prompts.
-            {colors['bold']}Type 'help/h' for guidence, 'quit/q' to exit.{colors['bold']}
+            {colors['bold']}Type 'help/h' for guidence, 'desc' to toggle cmd descriptions,  'quit/q' to exit.{colors['bold']}
 
             Need more help? Visit: {colors['blue']}{colors['underline']}{colors["bold"]}https://www.star.bristol.ac.uk/~mbt/stilts/{colors['reset']}
 
@@ -193,6 +194,19 @@ class CLI:
                 )
                 continue
 
+            elif self.input.lower() == "desc":
+                # disables automatic descriptions.
+                self.stilts_desc = not self.stilts_desc
+                if self.stilts_desc:
+                    print(
+                        f"{colors['green']}{colors['italic']}Descriptions Enabled{colors['reset']}"
+                    )
+                else:
+                    print(
+                        f"{colors['red']}{colors['italic']}Descriptions Disabled{colors['reset']}"
+                    )
+                continue
+
             self.add_to_message_history({"role": "user", "content": self.input})
 
             command = self.gen_model.generate_stream(self.message_history)
@@ -230,20 +244,25 @@ class CLI:
 
                         print("\n")
 
-                        command_explanation = self.stilts_model.generate_stream(
-                            f"Explain the following STILTS command: {full_command}"
-                        )
-                        full_explanation = ""
-                        for chunk in command_explanation:
-                            print(chunk, end="", flush=True)
-                            full_explanation += chunk
-                        print("\n")
-                        self.add_to_message_history(
-                            {
-                                "role": "assistant",
-                                "content": full_command + "\n\n" + full_explanation,
-                            }
-                        )
+                        if self.stilts_desc:
+                            command_explanation = self.stilts_model.generate_stream(
+                                f"Explain the following STILTS command: {full_command}"
+                            )
+                            full_explanation = ""
+                            for chunk in command_explanation:
+                                print(chunk, end="", flush=True)
+                                full_explanation += chunk
+                            print("\n")
+                            self.add_to_message_history(
+                                {
+                                    "role": "assistant",
+                                    "content": full_command + "\n\n" + full_explanation,
+                                }
+                            )
+                        else:
+                            self.add_to_message_history(
+                                {"role": "assistant", "content": full_command}
+                            )
                 else:
                     print(
                         f"{colors['red']}Error: Could not parse description from LLM tool call response.{colors['reset']}"
