@@ -82,6 +82,7 @@ class CLI:
         else:
             self.stilts_model = StiltsModel(
                 model_name=local_model_path,
+                force_download=self.force_download,
                 inference_library=self.inference_library,
                 num_proc=self.num_proc,
                 device=self.device,
@@ -150,6 +151,10 @@ class CLI:
                 print(f"{colors['red']}Exiting Stilts Model Loop.{colors['reset']}")
                 break
 
+            elif description == "":
+                print("Oops that must have been a mistake!")
+                continue
+
             stilts_command = self.stilts_model.generate_stream(description)
             full_command = ""
             # print("\nResponse:\n")
@@ -209,6 +214,10 @@ class CLI:
                     print(
                         f"{colors['red']}{colors['italic']}Descriptions Disabled{colors['reset']}"
                     )
+                continue
+
+            elif self.input == "":
+                print("Oops that must have been a mistake!")
                 continue
 
             self.add_to_message_history({"role": "user", "content": self.input})
@@ -412,7 +421,6 @@ def main():
     )
 
     args = parser.parse_args()
-
     # if --precision is set, use it for both models unless they are set individually
     if args.precision is not None:
         args.precision_stilts_model = args.precision

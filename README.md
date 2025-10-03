@@ -1,11 +1,28 @@
 # STILTS Natural Language Interface Commandline Tool.
 [![Run tests](https://github.com/RhysAlfShaw/stilts-nli/actions/workflows/pytest.yml/badge.svg)](https://github.com/RhysAlfShaw/stilts-nli/actions/workflows/pytest.yml)
 [![codecov](https://codecov.io/gh/RhysAlfShaw/stilts-nli/graph/badge.svg?token=E1FQ94JAHN)](https://codecov.io/gh/RhysAlfShaw/stilts-nli)
-[![PyPI version](https://badge.fury.io/py/stilts_nli.svg)](https://badge.fury.io/py/stilts_nli)
+[![PyPI version](https://badge.fury.io/py/stilts_nli.svg)]
+(https://badge.fury.io/py/stilts_nli)
+
+## Contents
+* [Dependencies](#dependencies)
+* [Installation](#installation)
+  * [pip](#pip)
+  * [Apple Silicon GPU (mps)](#apple-silicon-gpu-mps)
+  * [Manual installation (conda)](#manual-installation-conda)
+  * [Using quantised models with transformers](#using-quantised-models-with-transformers)
+  * [Installing Llama_cpp_python](#installing-llama_cpp_python)
+  * [Docker](#docker)
+* [Examples](#examples)
+* [Usage](#usage)
+* [Compute Requirements](#compute-requirements)
+
+
 ## Dependencies.
 [STILTS](https://www.star.bris.ac.uk/~mbt/stilts/ "https://www.star.bris.ac.uk/~mbt/stilts/") (accesable via the command stilts in the terminal.) This only limits the execution of the generated command.
-## Installation
 
+## Installation
+### PIP
 STILTS-NLI can be installed via pip with atleast python 3.12. It is recomended this is done in a virtual environment or conda environment.
 
 ```bash
