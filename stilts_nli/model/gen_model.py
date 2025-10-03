@@ -27,6 +27,7 @@ class GenModel(BaseModel):
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
                 device_map=self.device,
+                torch_dtype=torch.bfloat16,
                 quantization_config=quantization_config,
             )
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)

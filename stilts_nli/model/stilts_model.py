@@ -28,7 +28,7 @@ class StiltsModel(BaseModel):
             quantization_config = self._get_quantization_config()
             self.model = AutoModelForCausalLM.from_pretrained(
                 self.model_name,
-                torch_dtype=torch.float16,
+                torch_dtype=torch.bfloat16,
                 device_map=self.device,
                 attn_implementation="eager",
                 quantization_config=quantization_config,
