@@ -1,8 +1,7 @@
 # STILTS Natural Language Interface Commandline Tool.
 [![Run tests](https://github.com/RhysAlfShaw/stilts-nli/actions/workflows/pytest.yml/badge.svg)](https://github.com/RhysAlfShaw/stilts-nli/actions/workflows/pytest.yml)
 [![codecov](https://codecov.io/gh/RhysAlfShaw/stilts-nli/graph/badge.svg?token=E1FQ94JAHN)](https://codecov.io/gh/RhysAlfShaw/stilts-nli)
-[![PyPI version](https://badge.fury.io/py/stilts_nli.svg)]
-(https://badge.fury.io/py/stilts_nli)
+[![PyPI version](https://badge.fury.io/py/stilts_nli.svg)](https://badge.fury.io/py/stilts_nli)
 
 ## Contents
 * [Dependencies](#dependencies)
