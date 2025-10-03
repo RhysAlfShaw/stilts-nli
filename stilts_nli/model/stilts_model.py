@@ -15,7 +15,8 @@ class StiltsModel(BaseModel):
     A fine-tuned model for generating STILTS commands.
     """
 
-    def __init__(self, model_name=None, **kwargs):
+    def __init__(self, model_name=None, force_download=False, **kwargs):
+        self.force_download = force_download
         if model_name is None:
             model_name = "RAShaw/gemma-2b-stilts-prototype"
         kwargs.setdefault("model_name", model_name)
@@ -31,6 +32,7 @@ class StiltsModel(BaseModel):
                 device_map=self.device,
                 attn_implementation="eager",
                 quantization_config=quantization_config,
+                force_download=self.force_download,
             )
             self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
             print("Model loaded successfully.")

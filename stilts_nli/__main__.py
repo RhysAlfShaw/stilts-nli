@@ -82,6 +82,7 @@ class CLI:
         else:
             self.stilts_model = StiltsModel(
                 model_name=local_model_path,
+                force_download=self.force_download,
                 inference_library=self.inference_library,
                 num_proc=self.num_proc,
                 device=self.device,
@@ -412,7 +413,6 @@ def main():
     )
 
     args = parser.parse_args()
-
     # if --precision is set, use it for both models unless they are set individually
     if args.precision is not None:
         args.precision_stilts_model = args.precision
