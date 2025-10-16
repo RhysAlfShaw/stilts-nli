@@ -291,7 +291,7 @@ class CLI:
                 for message in reversed(self.message_history):
                     if message["role"] == "python":
                         # take the intire message content.
-                        print(message["content"])
+                        # print(message["content"])
                         stilts_commands = re.findall(
                             r"(stilts\s+[^\[\]]+)", message["content"]
                         )
@@ -300,7 +300,7 @@ class CLI:
                             last_stilts_command_in_history = stilts_commands[0]
                             break
 
-                print(last_stilts_command_in_history)
+                # print(last_stilts_command_in_history)
 
                 if last_stilts_command_in_history is not None:
                     for command in matches:
@@ -363,7 +363,7 @@ class CLI:
         try:
             print(f"{colors['yellow']}")
             # change stilts to /home/rhys/stilts
-            command = command.replace("stilts", "/home/rhys/stilts")
+            # command = command.replace("stilts", "/home/rhys/stilts")
             run = subprocess.run(
                 command, shell=True, check=True, text=True, capture_output=True
             )
