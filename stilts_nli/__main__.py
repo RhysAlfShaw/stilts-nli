@@ -60,7 +60,7 @@ class CLI:
         self.inference_library = inference_library
         self.num_proc = num_proc
         self.force_download = force_download
-        self.stilts_desc = True  # default on.
+        self.stilts_desc = False  # default on.
         self.local_model_path = local_model_path
 
         print(
@@ -229,6 +229,7 @@ class CLI:
 
             for chunk in command:
                 full_chunks += chunk
+                # print(full_chunks, end="\r", flush=True)
                 if not is_tool_call and "[" in chunk:
                     is_tool_call = True
 
@@ -237,9 +238,11 @@ class CLI:
 
             if not is_tool_call:
                 print("\n")
+
             self.add_to_message_history({"role": "assistant", "content": full_chunks})
 
             gen_model_responce = full_chunks.strip()
+            # print(gen_model_responce)
 
             if "stilts_command_generation" in gen_model_responce:
                 matches = re.findall(
@@ -268,13 +271,13 @@ class CLI:
                             print("\n")
                             self.add_to_message_history(
                                 {
-                                    "role": "assistant",
+                                    "role": "python",
                                     "content": full_command + "\n\n" + full_explanation,
                                 }
                             )
                         else:
                             self.add_to_message_history(
-                                {"role": "assistant", "content": full_command}
+                                {"role": "python", "content": full_command}
                             )
                 else:
                     print(
@@ -283,14 +286,27 @@ class CLI:
                     continue
 
             if "execute_stilts_command" in gen_model_responce:
-                matches = re.findall(
-                    r"execute_stilts_command\s*\(\s*stilts_command\s*=\s*['\"](.*?)['\"]\s*\)",
-                    gen_model_responce,
-                    re.DOTALL,
-                )
-                if matches:
+
+                last_stilts_command_in_history = None
+                for message in reversed(self.message_history):
+                    if message["role"] == "python":
+                        # take the intire message content.
+                        print(message["content"])
+                        stilts_commands = re.findall(
+                            r"(stilts\s+[^\[\]]+)", message["content"]
+                        )
+                        print(stilts_commands)
+                        if stilts_commands:
+                            last_stilts_command_in_history = stilts_commands[0]
+                            break
+
+                print(last_stilts_command_in_history)
+
+                if last_stilts_command_in_history is not None:
                     for command in matches:
-                        returned_output = self.eval_execute_command(command)
+                        returned_output = self.eval_execute_command(
+                            last_stilts_command_in_history
+                        )
                         self.add_to_message_history(
                             {"role": "python", "content": f"{returned_output}"}
                         )
@@ -346,11 +362,15 @@ class CLI:
         """execute the command using subprocess"""
         try:
             print(f"{colors['yellow']}")
+            # change stilts to /home/rhys/stilts
+            command = command.replace("stilts", "/home/rhys/stilts")
             run = subprocess.run(
                 command, shell=True, check=True, text=True, capture_output=True
             )
             print(f"{colors['reset']}")
             print(f"{colors['green']}Command executed successfully.{colors['reset']}")
+            # print the stdout
+            print(f"{colors['blue']}Output:\n{run.stdout}{colors['reset']}")
             return run.stdout
 
         except subprocess.CalledProcessError as e:
