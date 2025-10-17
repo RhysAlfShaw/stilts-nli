@@ -321,7 +321,7 @@ class CLI:
         return "stilts_command_generation" in response
 
     def greating(self):
-        print("Welcome to the Stilts CLI!")
+        print("Welcome to STITS-NLI!")
 
     def get_input(self):
         """ask the user for a command"""
