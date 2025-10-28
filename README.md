@@ -39,7 +39,7 @@ When first starting up the tool. It will download the models. This may take a fe
 Transformers has support for apple silicon's mps device, allowing for inference on apples GPU. This has joint memory with the CPU so becarful you have enough memory. The STILTS only model is executable, suing this command:
 
 ```bash
-stilts-nli --device mps --stilts_only_model
+stilts-nli --device mps --stilts_model_only
 ```
 
 ### Manual installation (conda)
