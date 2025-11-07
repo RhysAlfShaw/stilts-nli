@@ -339,13 +339,19 @@ class CLI:
             self.cli_loop()
 
     def _help(self):
+        print(f"{colors['bold']}Stilts-NLI Help:{colors['reset']}")
+        print("Type your natural language prompt to generate STILTS commands.")
         print("Example prompts:")
-        print("1. ############")
         print(
-            "Prompt: 'Create a command to match catalogues input.fits and input2.fits using RA and dec columns to within 1 arcsec'."
+            f"1. {colors['italic']}Create a command to match catalogues input.fits and input2.fits using RA and dec columns to within 1 arcsec{colors['reset']}"
         )
-        print("2. ############")
-        print("Prompt: 'How can I convert from a fits file to a csv file?'")
+        print(
+            f"2. {colors['italic']}How can I convert from a fits file to a csv file?{colors['reset']}"
+        )
+        print("Now try executing the generated command by asking the model:")
+        print(
+            f" {colors['italic']}Please execute this STILTS command.{colors['reset']}"
+        )
 
     def eval_execute_command(self, command):
         """execute the command"""
