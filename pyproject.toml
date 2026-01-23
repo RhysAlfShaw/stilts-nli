@@ -43,15 +43,11 @@ stilts-nli = "stilts_nli.__main__:main"
 [tool.hatch.version]
 path = "stilts_nli/__about__.py"
 
-# This section tells hatch where your actual source code is.
 [tool.hatch.build.targets.wheel]
 packages = ["stilts_nli"]
 
 [tool.hatch.envs.default]
-# Specifies that the default environment is managed by Conda.
-# Requires the `hatch-conda` plugin to be installed.
 type = "conda"
-# Tells hatch-conda to use your environment.yml to build the environment.
 environment-file = "environment.yml"
 
 [tool.hatch.envs.types]
@@ -60,12 +56,10 @@ extra-dependencies = [
 ]
 
 [tool.hatch.envs.types.scripts]
-# CORRECTED: Mypy needs the actual directory name 'stilts_nli', not 'src/stilts-nli'.
 check = "mypy --install-types --non-interactive {args:stilts_nli tests}"
 
 
 [tool.coverage.run]
-# CORRECTED: Coverage needs the importable package name 'stilts_nli'.
 source_pkgs = ["stilts_nli", "tests"]
 branch = true
 parallel = true
@@ -74,7 +68,6 @@ omit = [
 ]
 
 [tool.coverage.paths]
-# CORRECTED & SIMPLIFIED: This correctly maps the source directory.
 stilts_nli = ["stilts_nli", "*/stilts-nli/stilts_nli"]
 tests = ["tests", "*/stilts-nli/tests"]
 

@@ -229,7 +229,6 @@ class CLI:
 
             for chunk in command:
                 full_chunks += chunk
-                # print(full_chunks, end="\r", flush=True)
                 if not is_tool_call and "[" in chunk:
                     is_tool_call = True
 
@@ -242,7 +241,6 @@ class CLI:
             self.add_to_message_history({"role": "assistant", "content": full_chunks})
 
             gen_model_responce = full_chunks.strip()
-            # print(gen_model_responce)
 
             if "stilts_command_generation" in gen_model_responce:
                 matches = re.findall(
@@ -290,8 +288,6 @@ class CLI:
                 last_stilts_command_in_history = None
                 for message in reversed(self.message_history):
                     if message["role"] == "python":
-                        # take the intire message content.
-                        # print(message["content"])
                         stilts_commands = re.findall(
                             r"(stilts\s+[^\[\]]+)", message["content"]
                         )
@@ -299,8 +295,6 @@ class CLI:
                         if stilts_commands:
                             last_stilts_command_in_history = stilts_commands[0]
                             break
-
-                # print(last_stilts_command_in_history)
 
                 if last_stilts_command_in_history is not None:
                     for command in matches:
@@ -332,7 +326,6 @@ class CLI:
         )
 
     def run(self):
-        # start loop for the CLI
         if self.stilts_model_only:
             self.stilts_model_loop()
         else:
@@ -368,8 +361,6 @@ class CLI:
         """execute the command using subprocess"""
         try:
             print(f"{colors['yellow']}")
-            # change stilts to /home/rhys/stilts
-            # command = command.replace("stilts", "/home/rhys/stilts")
             run = subprocess.run(
                 command, shell=True, check=True, text=True, capture_output=True
             )
@@ -447,7 +438,6 @@ def main():
     )
 
     args = parser.parse_args()
-    # if --precision is set, use it for both models unless they are set individually
     if args.precision is not None:
         args.precision_stilts_model = args.precision
         args.precision_gen_model = args.precision
